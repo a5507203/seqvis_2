@@ -63,6 +63,7 @@ Editor.prototype = {
 	deleteScene:function(listItem,sceneName){
 	
 		var index = 0;
+		this.viewport.removeChild(listItem);
 		console.log(this.scenes.length);
 		for( var scene of this.scenes){
 			if(scene.name != sceneName) index += 1;
