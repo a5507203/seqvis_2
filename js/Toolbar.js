@@ -9,25 +9,45 @@ var Toolbar = function ( editor ) {
 	var buttons = new UI.Panel();
 	container.add( buttons );
 
-	
 	// three scenes in a row
 	var three = new UI.Button( 'THREE' );
 	var currSelected = three;
 	var currRules = Config.sceneSize.three;
 	three.dom.classList.add( 'selected' );
 	three.onClick( function () {
-    	updateUI(0);
+    	updateSceneSizeUI(0);
 	} );
 	buttons.add( three );
 
 	var four = new UI.Button( 'FOUR' );
 	four.onClick( function () {
-		updateUI(1);
+		updateSceneSizeUI(1);
 	} );
 	buttons.add( four );
 
 
-	function updateUI ( type ) {
+
+	var toggleAxes = new UI.Button( 'Toggle Axes' ).setMarginLeft('20px');
+	toggleAxes.dom.classList.add( 'selected' );
+	toggleAxes.onClick( function () {
+    //    updateGraphElementDisplay( 0 );
+	} );
+	buttons.add( toggleAxes );
+
+	var toggleWireframe = new UI.Button( 'Toggle Wireframe' );
+	toggleWireframe.onClick( function () {
+        // updateGraphElementDisplay( 1 );
+	} );
+	buttons.add( toggleWireframe );
+
+	var toggleLabels = new UI.Button( 'Toggle Base Labels' );
+	toggleLabels.onClick( function () {
+        // updateGraphElementDisplay( 2 );
+	} );
+	buttons.add( toggleLabels );
+
+
+	function updateSceneSizeUI ( type ) {
 
 		var currButton = three;
 		var preButton = four;
@@ -58,15 +78,15 @@ var Toolbar = function ( editor ) {
 
 	signals.fullScreenMode.add( function(bool, scene){
 
-			if( bool == true ) {
-				editor.hideOtherScenes(scene);
-				currSelected.dom.classList.remove( 'selected' );
-			}
-			else {
-				editor.setSceneSize( currRules );
-				currSelected.dom.classList.add( 'selected' );
-				editor.displayAllScenes();
-			}
+		if( bool == true ) {
+			editor.hideOtherScenes(scene);
+			currSelected.dom.classList.remove( 'selected' );
+		}
+		else {
+			editor.setSceneSize( currRules );
+			currSelected.dom.classList.add( 'selected' );
+			editor.displayAllScenes();
+		}
 
 	});
 
