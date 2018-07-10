@@ -174,6 +174,52 @@ UI.Span = function () {
 UI.Span.prototype = Object.create( UI.Element.prototype );
 UI.Span.prototype.constructor = UI.Span;
 
+
+// P
+
+UI.P = function ( text ) {
+
+	UI.Element.call( this );
+
+	var dom = document.createElement( 'p' );
+	// dom.className = 'Text';
+	// dom.style.cursor = 'default';
+	// dom.style.display = 'inline-block';
+  dom.style['overflow-y']="scroll";
+  dom.style['overflow-x']="hidden";
+  dom.style[  'word-break'] = 'break-all';
+//   dom.style.width = '200px';
+  dom.style.height = '100px';
+  
+	// dom.style.verticalAlign = 'middle';
+	this.dom = dom;
+	this.setValue( text );
+
+	return this;
+
+};
+
+UI.P.prototype = Object.create( UI.Element.prototype );
+UI.P.prototype.constructor = UI.P;
+
+UI.P.prototype.getValue = function () {
+
+	return this.dom.textContent;
+
+};
+
+UI.P.prototype.setValue = function ( value ) {
+
+	if ( value !== undefined ) {
+
+		this.dom.innerHTML = value;
+
+	}
+
+	return this;
+
+};
+
 // Div
 
 UI.Div = function () {
@@ -235,6 +281,7 @@ UI.Text = function ( text ) {
 	dom.style.cursor = 'default';
 	dom.style.display = 'inline-block';
 	dom.style.verticalAlign = 'middle';
+	dom.style[ 'word-break'] = 'break-all';
 	this.dom = dom;
 	this.setValue( text );
 

@@ -67,8 +67,8 @@ Sidebar.View = function ( editor ) {
 
 
 	//ADD PlOT
-	var addViewButton = new UI.Button( 'Add PLOT' );
-	addViewButton.onClick( function () {
+	var addPlotButton = new UI.Button( 'Add PLOT' );
+	addPlotButton.onClick( function () {
 		if (editor.inputData == null) return; 
 		var dim = plotOptions.getValue();
 		var axesName = axesNames[dim];
@@ -77,7 +77,30 @@ Sidebar.View = function ( editor ) {
 		signals.addScene.dispatch(newCoordinates,dim,axesName);
 
 	} );
-	container.add(addViewButton);
+	container.add(addPlotButton);
+
+	container.add( new UI.Break(),new UI.Break());
+
+	container.add(new UI.HorizontalRule());
+		container.add( new UI.Break());
+
+
+	//SEARCH BY NAME
+	var searchRow = new UI.Row();
+	var seqName = new UI.Input().setWidth( '100px' ).setValue('').setFontSize( '12px' );
+	searchRow.add( new UI.Text( 'NAME' ).setWidth( '50px' ) );
+	searchRow.add( seqName );
+	container.add( searchRow );
+
+	var searchButton = new UI.Button( 'SEARCH' ).setWidth('70').setLeft( '20px' );
+	searchButton.onClick( function () {
+		editor.selectByName(seqName.getValue());
+	});
+
+	searchRow.add(searchButton);
+
+	var parameters = new UI.Span();
+	container.add( parameters );
 
 	signals.dataPrepared.add(function( ){
 		
@@ -96,6 +119,95 @@ Sidebar.View = function ( editor ) {
 		
 
 	});
+
+	signals.objectSelected.add( function ( name ){
+
+		// console.log(editor.inputData.single[name]);
+		updateInfoGui( name );
+	});
+
+	function updateInfoGui(name){
+
+		parameters.clear();
+
+		// original Data
+		var originalDataRow = new UI.Row();
+		var originalData = new UI.P(editor.inputData.rawData[name]);
+		originalDataRow.add( new UI.Text( 'ORIGINAL DATA' ));
+		originalDataRow.add( originalData );
+		parameters.add( originalDataRow );
+		parameters.add( new UI.Break(),new UI.Break());
+
+		// Codon
+		var codonRow = new UI.Row();
+		var codon = new UI.P(editor.inputData.singleSeq[name]);
+		codonRow.add( new UI.Text( 'CODON' ));
+		codonRow.add( codon );
+		parameters.add( codonRow );
+
+		// freq
+		var condonFreqRow = new UI.Row();
+		// console.log(editor.inputData.single[name])
+		var freqs = editor.inputData.single[name];
+		console.log(freqs);
+		var condonFreq = new UI.Text('A: '+Math.round10(freqs.A,-2)+'  G: '+Math.round10(freqs.G,-2)+'  C: '+Math.round10(freqs.C,-2)+'   T: '+Math.round10(freqs.T,-2));
+		condonFreqRow.add( new UI.Text( 'FREQUENCE:' ).setWidth( '100px' ));
+		condonFreqRow.add( condonFreq );
+		parameters.add( condonFreqRow );
+		parameters.add( new UI.Break(),new UI.Break());
+
+
+		// first
+		var firstRow = new UI.Row();
+		var first = new UI.P(editor.inputData.firstSeq[name]);
+		firstRow.add( new UI.Text( 'FIRST POS' ));
+		firstRow.add( first );
+		parameters.add( firstRow );
+
+		// freq
+		var firstFreqRow = new UI.Row();
+		freqs = editor.inputData.first[name];
+		var firstFreq = new UI.Text('A: '+Math.round10(freqs.A,-2)+'  G: '+Math.round10(freqs.G,-2)+'  C: '+Math.round10(freqs.C,-2)+'   T: '+Math.round10(freqs.T,-2));
+		firstFreqRow.add( new UI.Text( 'FREQUENCE:' ).setWidth( '100px' ));
+		firstFreqRow.add( firstFreq );
+		parameters.add( firstFreqRow );
+		parameters.add( new UI.Break(),new UI.Break());
+
+		// SECOND
+		var secondSeqRow = new UI.Row();
+		var secondSeq = new UI.P(editor.inputData.secondSeq[name]);
+		secondSeqRow.add( new UI.Text( 'SECOND POS' ));
+		secondSeqRow.add( secondSeq );
+		parameters.add( secondSeqRow );
+
+		// freq
+		var secondFreqRow = new UI.Row();
+		// console.log(editor.inputData.single[name])
+		freqs = editor.inputData.second[name];
+		var  secondFreq = new UI.Text('A: '+Math.round10(freqs.A,-2)+'  G: '+Math.round10(freqs.G,-2)+'  C: '+Math.round10(freqs.C,-2)+'   T: '+Math.round10(freqs.T,-2));
+		secondFreqRow.add( new UI.Text( 'FREQUENCE:' ).setWidth( '100px' ));
+		secondFreqRow.add( secondFreq );
+		parameters.add( secondFreqRow );
+		parameters.add( new UI.Break(),new UI.Break());
+
+		// third
+		var thirdSeqRow = new UI.Row();
+		var thirdSeq = new UI.P(editor.inputData.thirdSeq[name]);
+		thirdSeqRow.add( new UI.Text( 'THIRD POS' ));
+		thirdSeqRow.add( thirdSeq );
+		parameters.add( thirdSeqRow );
+
+		// freq
+		var thirdFreqRow = new UI.Row();
+		// console.log(editor.inputData.single[name])
+		freqs = editor.inputData.third[name];
+		var  thirdFreq = new UI.Text('A: '+Math.round10(freqs.A,-2)+'  G: '+Math.round10(freqs.G,-2)+'  C: '+Math.round10(freqs.C,-2)+'   T: '+Math.round10(freqs.T,-2));
+		thirdFreqRow.add( new UI.Text( 'FREQUENCE:' ).setWidth( '100px' ));
+		thirdFreqRow.add( thirdFreq );
+		parameters.add( thirdFreqRow );
+
+	};
+
 
 	return container;
 

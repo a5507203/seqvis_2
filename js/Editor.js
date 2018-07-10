@@ -13,7 +13,7 @@ var Editor = function (  ) {
 	styleEl = document.createElement('style');
 	document.head.appendChild(styleEl);
 	this.styleSheet = styleEl.sheet;
-	this.styleSheet.insertRule(Config.sceneSize.three,0);
+	this.styleSheet.insertRule(Config.sceneSize.four,0);
 
 	this.viewport = document.createElement('div');
 	this.viewport.setAttribute('id','content');
@@ -22,6 +22,7 @@ var Editor = function (  ) {
 
 	this.addNewEdgeMode = 0;
 	this.inputData  = null;
+	this.selectionMode = 0;
 
 	var Signal = signals.Signal;
 
@@ -53,17 +54,72 @@ var Editor = function (  ) {
 		fileLoaded: new Signal(),
 		dataPrepared: new Signal(),
 
-		hideChild: new Signal()
+		hideChild: new Signal(),
+		selectionModeChanged: new Signal()
 	};
 
 
 	this.scenes = [];
-
+	this.selected = [];
 	this.fullScreenScene = null;
 
 };
 
 Editor.prototype = {
+
+	select: function ( object ) {
+		console.log('prev selection',this.selected[0]);
+		console.log('curr',object.name)
+		if (( this.selected[0] != undefined && this.selectionMode == 0 && this.selected[0].name == object.name )||( this.selected[0] != undefined && this.selectionMode == 1 && this.selected[0].uuid == object.uuid ) )return;
+
+		for( let sprite of this.selected ) sprite.material.color.set(0xff0000);
+		this.selected = [];
+
+		if(this.selectionMode == 0) this.crossSelect( object );
+		else this.singleSelect( object );
+
+		this.signals.objectSelected.dispatch( this.selected[0].name );
+		this.signals.renderRequired.dispatch();
+	},
+
+	selectByName : function( name ) {
+		
+		var object = {name: name};
+
+		if ( this.selected[0] != undefined && this.selected[0].name === object.name ) return;
+
+		for( let sprite of this.selected ) sprite.material.color.set(0xff0000);
+		this.selected = [];
+		this.crossSelect( object );
+
+		this.signals.objectSelected.dispatch( this.selected[0].name  );
+		this.signals.renderRequired.dispatch();
+
+
+	},
+
+	crossSelect: function ( object ) {
+		var scope  = this;
+		for ( let scene of this.scenes ) {
+			scene.children[3].children[2].traverse( function(sprite){
+				if (sprite.name == object.name){
+					scope.selected.push(sprite);
+					sprite.material.color.set(0x00ff00);
+				}
+			});
+
+		}
+		
+	},
+
+
+
+	singleSelect: function( object ) {
+
+		this.selected.push(object);
+		object.material.color.set(0x00ff00);
+	},
+
 
 	deleteScene:function(listItem,uuid){
 	
@@ -180,7 +236,7 @@ Editor.prototype = {
 
 	},
 
-	drawGraph : function( data, dim, axesNames ) {
+	drawGraph : function( objects, data, dim, axesNames ) {
 		
 		var graphGroup = new THREE.Group();
 		if(dim.length == 2) graphGroup.position.set(-0.5, 0, 0);
@@ -189,11 +245,10 @@ Editor.prototype = {
 
 		graphGroup.add(this.drawWireframe( dim.length-1 ));
 		graphGroup.add(this.drawAxes( dim, axesNames ));
-		graphGroup.add(this.drawData( data ));
+		graphGroup.add(this.drawData( objects, data ));
 		return graphGroup;	
 		
 	}, 
-	
 
 	drawWireframe : function ( dim ) {
 		var group = new THREE.Group();
@@ -301,6 +356,7 @@ Editor.prototype = {
 		group.add( new THREE.LineSegments( geometry, material ));
 		return group;
 	},
+
 	calcuateT: function(start,center){
 		var vec = new THREE.Vector3().subVectors(center,start).normalize().multiplyScalar(0.1);
 		var res = center.add(vec);
@@ -317,6 +373,7 @@ Editor.prototype = {
 		return res;
 
 	},
+
 	drawAxes: function ( dim, axesNames ) {
 	
 		var scope = this;
@@ -478,7 +535,8 @@ Editor.prototype = {
 		}
 		return group;
 	},
-	drawData: function( data ){
+
+	drawData: function( objects, data ){
 	
 		var group = new THREE.Group();
 		group.name  = 'data';
@@ -487,6 +545,7 @@ Editor.prototype = {
 		for (let [name,pointPos] of Object.entries(data)){
 			var sprite = this.drawSprite(pointPos, 0.01, Config.dataTexture, 0xff0000, name);
 			group.add( sprite );
+			objects.push(sprite);
 		}
 		return group;		
 	},
@@ -525,8 +584,7 @@ Editor.prototype = {
 		light.position.set( 1, 1, 1 );
 		scene.add( light );
 		
-		//ADD AXIS AND DATA
-		scene.add( scope.drawGraph( data, dim, axesNames ) );
+
 		scope.scenes.push( scene );
 
 		// CREATE ELEMENT IN HTML
@@ -535,17 +593,141 @@ Editor.prototype = {
 		scope.viewport.appendChild( element );
 
 		// ADD ORBIT CONTROLS
-		var controls = new THREE.OrbitControls( scene.userData.camera, scene.userData.element );
-		controls.minDistance = 0.5;
-		controls.maxDistance = 2;
+		var orbitControls = new THREE.OrbitControls( scene.userData.camera, scene.userData.element );
+		orbitControls.minDistance = 0.25;
+		orbitControls.maxDistance = 2;
 		// controls.enablePan = false;
 		// controls.enableZoom = false;
-		scene.userData.controls = controls;
-		controls.addEventListener('change', function(){
+		scene.userData.orbitControls = orbitControls;
+		orbitControls.addEventListener('change', function(){
 			scope.signals.renderRequired.dispatch();
 		});
-
+		//ADD OBJECT SELECTION CONTROLS
+		scope.objectPicking(scene);
+		//ADD AXIS AND DATA
+		scene.add( scope.drawGraph(scene.userData.objects, data, dim, axesNames ) );
 		scope.signals.renderRequired.dispatch();
+	},
+
+	objectPicking:function(scene){
+		var scope = this;
+		var raycaster = scene.userData.raycaster = new THREE.Raycaster();
+		var mouse = scene.userData.mouse = new THREE.Vector2();
+		var objects = scene.userData.objects = [];
+		var camera = scene.userData.camera;
+		var container = scene.userData.element;
+		
+		// events
+
+		function getIntersects( point, objects ) {
+
+			mouse.set( ( point.x * 2 ) - 1, - ( point.y * 2 ) + 1 );
+
+			raycaster.setFromCamera( mouse, camera );
+
+			return raycaster.intersectObjects( objects );
+
+		}
+
+		var onDownPosition = new THREE.Vector2();
+		var onUpPosition = new THREE.Vector2();
+		var onDoubleClickPosition = new THREE.Vector2();
+
+		function getMousePosition( dom, x, y ) {
+
+			var rect = dom.getBoundingClientRect();
+			return [ ( x - rect.left ) / rect.width, ( y - rect.top ) / rect.height ];
+
+		}
+
+		function handleClick() {
+			
+			if ( onDownPosition.distanceTo( onUpPosition ) === 0 ) {
+			
+				var intersects = getIntersects( onUpPosition, objects );
+				//var intersects = []
+
+				if ( intersects.length > 0 ) {
+
+					var object = intersects[ 0 ].object;
+					
+					
+					if ( object.userData.object !== undefined ) {
+
+
+						
+					} else {
+						console.log(object);
+						// console.log(scope.inputData.single[])
+						scope.select( object );
+
+					}
+
+				} else {
+
+					// editor.select( null );
+
+				}
+
+				// render();
+
+			}
+
+		}
+
+		function onMouseDown( event ) {
+
+			event.preventDefault();
+		
+			var array = getMousePosition( container, event.clientX, event.clientY );
+			onDownPosition.fromArray( array );
+
+
+			document.addEventListener( 'mouseup', onMouseUp, false );
+
+		}
+
+		function onMouseUp( event ) {
+
+			var array = getMousePosition( container, event.clientX, event.clientY );
+			onUpPosition.fromArray( array );
+
+			handleClick();
+
+			document.removeEventListener( 'mouseup', onMouseUp, false );
+
+		}
+
+		function onTouchStart( event ) {
+
+			var touch = event.changedTouches[ 0 ];
+
+			var array = getMousePosition( container, touch.clientX, touch.clientY );
+			onDownPosition.fromArray( array );
+
+			document.addEventListener( 'touchend', onTouchEnd, false );
+
+		}
+
+		function onTouchEnd( event ) {
+
+			var touch = event.changedTouches[ 0 ];
+
+			var array = getMousePosition( container, touch.clientX, touch.clientY );
+			onUpPosition.fromArray( array );
+
+			handleClick();
+
+			document.removeEventListener( 'touchend', onTouchEnd, false );
+
+		}
+
+
+		container.addEventListener( 'mousedown', onMouseDown, false );
+		container.addEventListener( 'touchstart', onTouchStart, false );
+
+
+		
 	},
 
 	setSceneSize: function(rules){

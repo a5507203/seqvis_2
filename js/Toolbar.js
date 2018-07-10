@@ -13,38 +13,19 @@ var Toolbar = function ( editor ) {
 	var three = new UI.Button( 'THREE' );
 	var currSelected = three;
 	var currRules = Config.sceneSize.three;
-	three.dom.classList.add( 'selected' );
+	
 	three.onClick( function () {
     	updateSceneSizeUI(0);
 	} );
 	buttons.add( three );
 
 	var four = new UI.Button( 'FOUR' );
+	four.dom.classList.add( 'selected' );
 	four.onClick( function () {
 		updateSceneSizeUI(1);
 	} );
 	buttons.add( four );
 
-
-
-	var toggleAxes = new UI.Button( 'Toggle Axes' ).setMarginLeft('20px');
-	toggleAxes.dom.classList.add( 'selected' );
-	toggleAxes.onClick( function () {
-    //    updateGraphElementDisplay( 0 );
-	} );
-	buttons.add( toggleAxes );
-
-	var toggleWireframe = new UI.Button( 'Toggle Wireframe' );
-	toggleWireframe.onClick( function () {
-        // updateGraphElementDisplay( 1 );
-	} );
-	buttons.add( toggleWireframe );
-
-	var toggleLabels = new UI.Button( 'Toggle Base Labels' );
-	toggleLabels.onClick( function () {
-        // updateGraphElementDisplay( 2 );
-	} );
-	buttons.add( toggleLabels );
 
 
 	function updateSceneSizeUI ( type ) {
@@ -75,6 +56,35 @@ var Toolbar = function ( editor ) {
 
 	}
 
+
+
+	var crossSelection = new UI.Button( 'Cross Selection' ).setMarginLeft('20px');
+	crossSelection.dom.classList.add( 'selected' );
+	crossSelection.onClick( function () {
+		signals.selectionModeChanged.dispatch( 0 );
+	} );
+	buttons.add( crossSelection );
+
+	var singleSelection = new UI.Button( 'Single Selection' );
+	singleSelection.onClick( function () {
+        signals.selectionModeChanged.dispatch( 1 );
+	} );
+	buttons.add( singleSelection );
+
+
+	signals.selectionModeChanged.add( function( type ){
+
+		crossSelection.dom.classList.remove( 'selected' );
+		singleSelection.dom.classList.remove( 'selected' );
+	
+
+		switch ( type ) {
+
+			case 0: crossSelection.dom.classList.add( 'selected' ); break;
+			case 1: singleSelection.dom.classList.add( 'selected' ); break;
+
+		}
+	});
 
 	signals.fullScreenMode.add( function(bool, scene){
 

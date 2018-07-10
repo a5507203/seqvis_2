@@ -15,7 +15,7 @@ button {
 
 	button.selected {
 		color: #fff;
-		background-color: #08f;
+		background-color: #f13082;
 	}
 
 input, textarea {
@@ -125,7 +125,7 @@ select {
 
 				#menubar .menu .options .option:hover {
 					color: #fff;
-					background-color: #08f;
+					background-color: #f13082;
 				}
 
 				#menubar .menu .options .option:active {
@@ -153,7 +153,7 @@ select {
 }  
 	#wrap > label{ display:inline-block; }  
 	#wrap > label{   
-		background:#f1103a;  
+		background:#f13082;  
 		border: 0px;
 		color: #FFF;  
 		cursor: pointer;  
@@ -218,6 +218,7 @@ select {
 		color: #555;
 		border-right: 1px solid #222;
 		padding: 10px;
+
 	}
 
 	#tabs span.selected {
@@ -379,5 +380,5 @@ select {
 		/* display: table-cell; */
 	}
 	.list-item .foot > button:hover {
-		   background-color: RoyalBlue;
+		   background-color: #888;
 	}
