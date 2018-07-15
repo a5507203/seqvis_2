@@ -5,7 +5,7 @@ var Sidebar = function ( editor ) {
 	container.setId( 'sidebar' );
 
 
-	var viewTab = new UI.Text( 'VIEW' ).onClick( onClick );
+	var viewTab = new UI.Text( 'View' ).onClick( onClick );
 	// var editTab = new UI.Text( 'EDIT' ).onClick( onClick );
 	// var clusterTab  = new UI.Text( 'CLUSTER' ).onClick( onClick );
 	

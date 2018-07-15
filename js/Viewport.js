@@ -26,9 +26,9 @@ var Viewport = function ( editor ) {
 
 
 	//SIGNALS
-	signals.addScene.add(function (data,dim, axesName) {
+	signals.addScene.add(function (sceneName, data,dim, axesName) {
 		//TODO scene name
-		editor.addScene(data,dim, axesName);
+		editor.addScene(sceneName, data,dim, axesName);
 
 	});
 
@@ -73,11 +73,12 @@ var Viewport = function ( editor ) {
 
 	signals.hideChild.add(function(parent, childName){
 		var child;
-		if(childName == 'wireframe') child = parent.children[3].children[0];
+		console.log(parent,childName);
+		if(childName == 'wireframe') child = parent.children[1].children[0];
 		
-		else if(childName == 'axes') child = parent.children[3].children[1].children[0];
+		else if(childName == 'axes') child = parent.children[1].children[1].children[0];
 		
-		else if(childName == 'labels') child = parent.children[3].children[1].children[1];
+		else if(childName == 'labels') child = parent.children[1].children[1].children[1];
 		
 
 		if( child.visible == true) child.visible = false;

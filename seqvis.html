@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>SeqVis II</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link rel="shortcut icon" type="image/x-icon" href="./image/logo.png" />
+		<link href="css/main.css" rel="stylesheet" />
+		<link id="theme" href="css/dark.css" rel="stylesheet" />
+
+	</head>
+	<body >
+
+
+
+		
+		<script src="js/libs/decimalAdjustment.js"></script>
+		<script src="js/libs/FileSaver.js"></script>
+		
+		<script src="js/libs/three.js"></script>
+
+		<script src="js/libs/jszip.js"></script>
+		<script src="js/libs/three.meshline.js"></script>
+		<script src="js/libs/Tween.js"></script>
+		<script src="js/libs/signals.min.js"></script>
+		<script src="js/libs/ui.js"></script>
+		<script src="js/libs/ui.three.js"></script>
+		<script src="js/libs/d3.min.js"></script>
+
+
+		<script src="js/CoodinateConvertion.js"></script>
+		<script src="js/Config.js"></script>
+		<script src="js/Command.js"></script>
+
+		<script src="js/Editor.js"></script>
+		<script src="js/FileLoader.js"></script>
+		<!-- <script src="js/History.js"></script> -->
+		<script src="js/Menubar.js"></script>
+		<script src="js/Menubar.File.js"></script>
+		<script src="js/Menubar.Help.js"></script>
+
+		<script src="js/Toolbar.js"></script>
+		<script src="js/Viewport.js"></script>
+		<script src = 'js/controls/OrbitControls.js'></script>
+
+
+		<script src="js/Sidebar.js"></script>
+		<script src="js/Sidebar.View.js"></script>
+		<script src="js/Sidebar.ClusterMethod.js"></script>
+		<script src="js/Sidebar.Edit.js"></script>
+
+
+		<script>
+
+			window.URL = window.URL || window.webkitURL;
+			window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
+
+			const IS_MAC = navigator.platform.toUpperCase().indexOf( 'MAC' ) >= 0;
+
+			Number.prototype.format = function (){
+				return this.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+			};
+
+			var textureloader = new THREE.TextureLoader();
+			textureloader.load( './image/disc.png', function( texture ) {
+				Config.dataTexture = texture;
+				console.log('loaded');
+				var editor = new Editor();
+
+				var menubar = new Menubar( editor );
+				document.body.appendChild( menubar.dom );	
+	
+				var viewport = new Viewport( editor );
+
+				var loadFile  = new FileLoader(editor);
+				
+				var sidebar = new Sidebar( editor );
+				document.body.appendChild( sidebar.dom );
+	
+	
+				var toolbar = new Toolbar(editor);
+				document.body.appendChild(toolbar.dom);
+		
+			
+				
+				document.addEventListener( 'keydown', function ( event ) {
+	
+					switch ( event.keyCode ) {
+	
+	
+					}
+	
+					}, false );
+	
+				function onWindowResize( event ) {
+	
+				editor.signals.windowResize.dispatch();
+	
+				}
+	
+				window.addEventListener( 'resize', onWindowResize, false );
+	
+				onWindowResize();
+			}, false );
+
+			
+		</script>
+
+
+	</body>
+</html>

@@ -1,27 +1,27 @@
 button {
-	color: #aaa;
-	background-color: #222;
+	color: #d4d4d4;
+	background-color: #333;
 	border: 0px;
 	padding: 5px 8px;
-	text-transform: uppercase;
+	/* text-transform: uppercase; */
 	cursor: pointer;
 	outline: none;
 }
 
 	button:hover {
 		color: #ccc;
-		background-color: #444;
+		background-color: #555;
 	}
 
 	button.selected {
 		color: #fff;
-		background-color: #f13082;
+		background-color: #365a79;
 	}
 
 input, textarea {
-	background-color: #222;
+	background-color: #333;
 	border: 1px solid transparent;
-	color: #888;
+	color: #d4d4d4;
 }
 
 input.Number {
@@ -33,17 +33,17 @@ input.Number {
 }
 
 select {
-	color: #aaa;
-	background-color: #222;
+	color: #d4d4d4;
+	background-color: #333;
 	border: 0px;
-	text-transform: uppercase;
+	/* text-transform: uppercase; */
 	cursor: pointer;
 	outline: none;
 }
 
 	select:hover {
 		color: #ccc;
-		background-color: #444;
+		background-color: #555;
 	}
 
 /* UI */
@@ -71,7 +71,7 @@ select {
 	width: 100%;
 	height: 32px;
 	z-index:  999;
-	background: #111;
+	background: #222;
 	padding: 0;
 	margin: 0;
 	right: 0;
@@ -93,7 +93,7 @@ select {
 
 		#menubar .menu .title {
 			display: inline-block;
-			color: #888;
+			color: #d4d4d4;
 			margin: 0;
 			padding: 8px;
 		}
@@ -102,7 +102,7 @@ select {
 			position: fixed;
 			display: none;
 			padding: 5px 0;
-			background: #111;
+			background: #222;
 			width: 150px;
 			max-height: calc(100% - 80px);
 			overflow: auto;
@@ -113,11 +113,11 @@ select {
 		}
 
 			#menubar .menu .options hr {
-				border-color: #222;
+				border-color: #333;
 			}
 
 			#menubar .menu .options .option {
-				color: #888;
+				color: #d4d4d4;
 				background-color: transparent;
 				padding: 5px 10px;
 				margin: 0 !important;
@@ -125,7 +125,7 @@ select {
 
 				#menubar .menu .options .option:hover {
 					color: #fff;
-					background-color: #f13082;
+					background-color: #555;
 				}
 
 				#menubar .menu .options .option:active {
@@ -133,7 +133,7 @@ select {
 				}
 
 		#menubar .menu .options .inactive {
-			color: #444;
+			color: #555;
 			background-color: transparent;
 			padding: 5px 10px;
 			margin: 0 !important;
@@ -141,8 +141,8 @@ select {
 
 
 #sideToggle{ display:none; }  
-#sideToggle:checked ~ #sidebar{ right:0; }  
-#sideToggle:checked ~ #wrap{ padding-right:220px;  }  
+#sideToggle:checked ~ #sidebar{ right:-25em; }  
+/* #sideToggle:checked ~ #wrap{ padding-right:220px;  }   */
 #wrap{ 
 
 	/* margin-right:30px;  */
@@ -153,7 +153,7 @@ select {
 }  
 	#wrap > label{ display:inline-block; }  
 	#wrap > label{   
-		background:#f13082;  
+		background:#222;  
 		border: 0px;
 		color: #FFF;  
 		cursor: pointer;  
@@ -168,17 +168,17 @@ select {
 		text-shadow: 0 -4px;  
 		z-index: 99999;
 	}  
-	#wrap > label:hover{ background:#000; }  
+	#wrap > label:hover{ background:#555; }  
 
 	
 
 #sidebar {
 
-	background-color: #111;
+	background-color: #222;
 	position:absolute; 
     top:32px; 
     bottom:0; 
-    right:-25em; 
+    right:0; 
     width:25em; 
 	overflow: auto;
     transition:0.2s ease-out; 
@@ -191,9 +191,9 @@ select {
 	}
 
 	#sidebar .Panel {
-		color: #888;
+		color: #d4d4d4;
 		padding: 10px;
-		border-top: 1px solid #222;
+		border-top: 1px solid #333;
 	}
 
 	#sidebar .Panel.collapsed {
@@ -211,19 +211,19 @@ select {
 
 #tabs {
 	background-color: #1b1b1b;
-	border-top: 1px solid #222;
+	border-top: 1px solid #333;
 }
 
 	#tabs span {
 		color: #555;
-		border-right: 1px solid #222;
+		border-right: 1px solid #333;
 		padding: 10px;
 
 	}
 
 	#tabs span.selected {
-		color: #888;
-		background-color: #111;
+		color: #d4d4d4;
+		background-color: #365a79;
 	}
 
 #toolbar {
@@ -232,7 +232,7 @@ select {
 	right: 0;
 	bottom: 0;
 	height: 32px;
-	background-color: #111;
+	background-color: #222;
 	color: #333;
 }
 
@@ -242,7 +242,7 @@ select {
 
 	#toolbar .Panel {
 		padding: 4px;
-		color: #888;
+		color: #d4d4d4;
 	}
 
 	#toolbar button {
@@ -250,8 +250,8 @@ select {
 	}
 
 .Outliner {
-	color: #888;
-	background: #222;
+	color: #d4d4d4;
+	background: #333;
 	padding: 0;
 	width: 100%;
 	height: 140px;
@@ -348,7 +348,7 @@ select {
 	}
 
 	.list-item .foot .description {
-		color: #888;
+		/* color: #d4d4d4; */
 		font-family: sans-serif;
 		font-size: medium;
 		
@@ -360,7 +360,7 @@ select {
 	.list-item .foot .optionButton {
 		background-color: transparent;
 		border: none;
-		color:  #888;
+		/* color:  #d4d4d4; */
 		font-family: sans-serif;
 		font-size: medium;
 		cursor: pointer;
@@ -373,12 +373,12 @@ select {
 	.list-item .foot .closeButton {
 		background-color: transparent;
 		border: none;
-		color:  #888;
+		/* color:  #d4d4d4; */
 		font-family: Garamond, "Apple Garamond";
 
 		cursor: pointer;
 		/* display: table-cell; */
 	}
 	.list-item .foot > button:hover {
-		   background-color: #888;
+		   background-color: #d4d4d4;
 	}

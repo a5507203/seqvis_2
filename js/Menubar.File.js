@@ -30,7 +30,7 @@ Menubar.File = function ( editor ) {
 	var fileInput = document.createElement( 'input' );
 	fileInput.type = 'file';
 	fileInput.addEventListener( 'change', function ( event ) {
-		signals.fileLoaded.dispatch(fileInput.files[ 0 ]);
+		signals.fileLoaded.dispatch(fileInput.files[ 0 ],'');
 		form.reset();
 
 	} );
@@ -45,6 +45,8 @@ Menubar.File = function ( editor ) {
 
 	} );
 	options.add( upload );
+
+
 	
 	return container;
 

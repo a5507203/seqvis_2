@@ -68,17 +68,17 @@ var Editor = function (  ) {
 Editor.prototype = {
 
 	select: function ( object ) {
-		console.log('prev selection',this.selected[0]);
-		console.log('curr',object.name)
+		// console.log('prev selection',this.selected[0]);
+		// console.log('curr',object.name)
 		if (( this.selected[0] != undefined && this.selectionMode == 0 && this.selected[0].name == object.name )||( this.selected[0] != undefined && this.selectionMode == 1 && this.selected[0].uuid == object.uuid ) )return;
 
-		for( let sprite of this.selected ) sprite.material.color.set(0xff0000);
+		for( let sprite of this.selected ) sprite.material.color.set(Config.spriteColor);
 		this.selected = [];
 
 		if(this.selectionMode == 0) this.crossSelect( object );
 		else this.singleSelect( object );
 
-		this.signals.objectSelected.dispatch( this.selected[0].name );
+		this.signals.objectSelected.dispatch( object );
 		this.signals.renderRequired.dispatch();
 	},
 
@@ -88,11 +88,10 @@ Editor.prototype = {
 
 		if ( this.selected[0] != undefined && this.selected[0].name === object.name ) return;
 
-		for( let sprite of this.selected ) sprite.material.color.set(0xff0000);
+		for( let sprite of this.selected ) sprite.material.color.set(Config.spriteColor);
 		this.selected = [];
 		this.crossSelect( object );
-
-		this.signals.objectSelected.dispatch( this.selected[0].name  );
+		if(this.selected.length != 0) this.signals.objectSelected.dispatch( this.selected[0]  );
 		this.signals.renderRequired.dispatch();
 
 
@@ -101,7 +100,7 @@ Editor.prototype = {
 	crossSelect: function ( object ) {
 		var scope  = this;
 		for ( let scene of this.scenes ) {
-			scene.children[3].children[2].traverse( function(sprite){
+			scene.children[1].children[2].traverse( function(sprite){
 				if (sprite.name == object.name){
 					scope.selected.push(sprite);
 					sprite.material.color.set(0x00ff00);
@@ -495,7 +494,7 @@ Editor.prototype = {
 				new THREE.Vector3(0,0,0),
 				new THREE.Vector3(1,0,0)
 			];
-			colors = [0xff0000, 0x0000ff];
+			colors = [Config.spriteColor, 0x0000ff];
 		
 		}
 		else if(len == 3) {
@@ -504,7 +503,7 @@ Editor.prototype = {
 				new THREE.Vector3( -0.0866, -0.05, 0 ),
 				new THREE.Vector3( 1.0866, -0.05, 0 )
 			];
-			colors  = [0x00ff00, 0xff0000, 0x0000ff];
+			colors  = [0x00ff00, Config.spriteColor, 0x0000ff];
 		}
 		else if (len == 4) {
 			coordinates = [	
@@ -513,13 +512,13 @@ Editor.prototype = {
 				new THREE.Vector3 ( 1.0783, -0.0426, -0.0452),
 				new THREE.Vector3 ( 0.5, -0.0426, 0.9565)
 			];
-			colors  = [0x00ff00, 0xff0000, 0x0000ff, 0xffff00];
+			colors  = [0x00ff00, Config.spriteColor, 0x0000ff, 0xffff00];
 		}
 		var counter = 0;
+
 		var loader = new THREE.TextureLoader();
 
-
-		for ( var axesName of axesNames){
+		function drawAxis(axesName, coordinate, color){
 			loader.load(
 			
 				'./image/'+axesName+'.png',
@@ -527,41 +526,49 @@ Editor.prototype = {
 				function ( texture ) {
 				
 					// if(len!=3) return;
-					var sprite = scope.drawSprite(coordinates[counter], 0.2, texture, colors[counter], 'label');
+					var sprite = scope.drawSprite(coordinate, 0.2, texture, color, 'label');
 					group.add( sprite);
 					counter += 1;
 					if(counter == len) callback(group);
 			});
 		}
+
+		for ( var i = 0;i<len;i+=1){
+
+			drawAxis(axesNames[i],coordinates[i],colors[i]);
+
+		}
 		return group;
 	},
 
 	drawData: function( objects, data ){
-	
+			console.log(data)
 		var group = new THREE.Group();
 		group.name  = 'data';
 		group.position.set(0, 0, 0);
 
-		for (let [name,pointPos] of Object.entries(data)){
-			var sprite = this.drawSprite(pointPos, 0.01, Config.dataTexture, 0xff0000, name);
+		for (let [name,pointInfo] of Object.entries(data)){
+		
+			var sprite = this.drawSprite(pointInfo.position, 0.01, Config.dataTexture, Config.spriteColor, name,pointInfo.frequence);
 			group.add( sprite );
 			objects.push(sprite);
 		}
 		return group;		
 	},
 
-	drawSprite: function(position,scale,texture,color,name){
+	drawSprite: function(position,scale,texture,color,name, freq){
 
 		var spriteMaterial = new THREE.SpriteMaterial( {map:texture, color: color, alphaTest: 0.5, depthTest: true} );
 		var sprite = new THREE.Sprite( spriteMaterial );
 		sprite.scale.set(scale, scale, scale);
 		sprite.position.copy(position);
+		if(freq) sprite.freq = freq;
 		sprite.name = name;
 		return sprite;
 
 	},
 
-	addScene: function( data, dim, axesNames ){
+	addScene: function(sceneName, data, dim, axesNames ){
 		var scope = this;
 		var geometries = [
 			new THREE.ConeBufferGeometry( 2, 3, 3 ),
@@ -573,22 +580,27 @@ Editor.prototype = {
 		// scene.name = i;
 		// CREATE PERSPECTIVE CAMERA
 		var camera = new THREE.PerspectiveCamera( 50, 1);
-		camera.position.z = 2;
+		// camera.position.y = 1;
+		camera.position.z = 1.75;
 		scene.userData.camera = camera;
 
 		// ADD LIGHT
-        
-		scene.add( new THREE.HemisphereLight( 0xaaaaaa, 0x444444 ) );
-		scene.add( new THREE.HemisphereLight( 0xaaaaaa, 0x444444 ) );
-		var light = new THREE.DirectionalLight( 0xffffff, 0.5 );
-		light.position.set( 1, 1, 1 );
+		var light = new THREE.AmbientLight( 0x404040 ); // soft white light
 		scene.add( light );
-		
+		// scene.add( new THREE.HemisphereLight( 0xaaaaaa, 0x444444 ) );
+		// scene.add( new THREE.HemisphereLight( 0xaaaaaa, 0x444444 ) );
+		// var light = new THREE.DirectionalLight( 0xffffff, 0.5 );
+		// light.position.set( 1, 1, 1 );
+		// scene.add( light );
+		console.log(scene);
+		scene.background = new THREE.Color(0x030303);
 
 		scope.scenes.push( scene );
 
 		// CREATE ELEMENT IN HTML
-		var element = this.createSceneContainer(dim.join(),scene);
+		// var element = this.createSceneContainer(dim.join(),scene);
+		var element = this.createSceneContainer(sceneName,scene);
+	
 		scene.userData.element = element.querySelector( ".scene" );
 		scope.viewport.appendChild( element );
 

@@ -1,0 +1,55 @@
+
+html { 
+  background: url(../image/dna.jpg) no-repeat center center fixed; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+.container{
+  width: 100%;
+  margin-top: 20%;
+  text-align: center;
+  font-family: "Playfair Display", Arial, serif;
+  color: #fff;
+  
+
+}
+h1{
+
+  font-size: 100px;
+}
+h2{
+
+  font-size: 50px;
+}
+
+.file{
+
+  margin-top: 50px;
+  font-weight: normal;
+}
+
+.file>.upload{
+
+
+  color:#fff;
+  background: rgba(48, 167, 5);
+  font-size:20px;
+  height: 50px;
+  width: 200px;
+  border: none;
+  box-shadow: none;
+  border-radius: 10px;
+
+}
+.file>.demo{
+  background: rgba(255, 255, 255, 0.8);
+  font-size:20px;
+  height: 50px;
+  width: 100px;
+  border: none;
+  box-shadow: none;
+  border-radius: 10px;
+}
