@@ -27,7 +27,7 @@ FileLoader.prototype = {
         var scope = this;
         scope.reader.addEventListener( 'load', function ( event ) {	
             var contents = event.target.result;
-            console.log(JSON.stringify(contents))
+            console.log(JSON.stringify(contents));
             if(file.name.match(/\.fasta/)){
                 scope.dataPreprocessFasta(contents);
                 scope.signals.dataPrepared.dispatch();

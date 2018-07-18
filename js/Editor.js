@@ -618,8 +618,8 @@ Editor.prototype = {
 		var orbitControls = new THREE.OrbitControls( scene.userData.camera, scene.userData.element );
 		orbitControls.minDistance = 0.25;
 		orbitControls.maxDistance = 2;
-		// controls.enablePan = false;
-		// controls.enableZoom = false;
+		orbitControls.enablePan = false;
+		// orbitControls.enableZoom = false;
 		scene.userData.orbitControls = orbitControls;
 		orbitControls.addEventListener('change', function(){
 			scope.signals.renderRequired.dispatch();

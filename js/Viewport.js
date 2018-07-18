@@ -119,7 +119,6 @@ var Viewport = function ( editor ) {
 
 	}
 	function render(scene){
-		console.log(scene);
 		var element = scene.userData.element;
 		if(element.style.display == 'none') return;
 		// get its position relative to the page's viewport
