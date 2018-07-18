@@ -88,6 +88,7 @@ FileLoader.prototype = {
             // console.log(seq)
             // console.log(JSON.stringify(seq));
             currFreqs = this.getFrequency(seq);
+            // storeData(input, currFreqs);
         
             input.single[seqName] = currFreqs[0];
             input.first[seqName] = currFreqs[1];
@@ -240,7 +241,7 @@ FileLoader.prototype = {
             currCode = data[i];
             if (/^[A-Z]$/i.test(currCode)==false) continue;
            
-            if(currCode =='A' || currCode=='G' || currCode == 'C'|| currCode == 'G'){
+            if(currCode =='A' || currCode=='G' || currCode == 'C'|| currCode == 'T'){
                 
                 fre[currCode]++;
                 freSeq += currCode;
