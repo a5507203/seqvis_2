@@ -14,6 +14,7 @@ var Toolbar = function ( editor ) {
 	var two = new UI.Button( 'Two' );
 	var currSelected = two;
 	var currRules = Config.sceneSize.two;
+	two.dom.classList.add( 'selected' );
 
 	two.onClick( function () {
     	updateSceneSizeUI(2);
@@ -31,7 +32,7 @@ var Toolbar = function ( editor ) {
 	buttons.add( three );
 
 	var four = new UI.Button( 'Four' );
-	four.dom.classList.add( 'selected' );
+	
 	four.onClick( function () {
 		updateSceneSizeUI(4);
 	} );
@@ -50,20 +51,24 @@ var Toolbar = function ( editor ) {
 
 			case 2: 
 				rules = Config.sceneSize.two;
-				two.dom.classList.add( 'selected' ); 
+				currSelected = two;
 				break;
 			case 3: 
 				rules = Config.sceneSize.three;
-				three.dom.classList.add( 'selected' ); 
+				currSelected = three; 
 				break;
 			case 4: 
 				rules = Config.sceneSize.four;
-				four.dom.classList.add( 'selected' ); 
+				currSelected = four; 
 				break;
 
 		}
-		editor.setSceneSize(rules);
+
+		currSelected.dom.classList.add( 'selected' );
+		currRules = rules;
 		editor.displayAllScenes();
+		editor.setSceneSize(rules);
+	
 		editor.fullScreenMode = 0;
 		// var currButton = three;
 		// var preButton = four;
@@ -126,11 +131,13 @@ var Toolbar = function ( editor ) {
 		if( bool == true ) {
 			editor.hideOtherScenes(scene);
 			currSelected.dom.classList.remove( 'selected' );
+			this.signals.renderRequired.dispatch();
 		}
 		else {
+			editor.displayAllScenes();
 			editor.setSceneSize( currRules );
 			currSelected.dom.classList.add( 'selected' );
-			editor.displayAllScenes();
+		
 		}
 
 	});

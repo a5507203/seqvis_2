@@ -13,7 +13,7 @@ var Editor = function (  ) {
 	styleEl = document.createElement('style');
 	document.head.appendChild(styleEl);
 	this.styleSheet = styleEl.sheet;
-	this.styleSheet.insertRule(Config.sceneSize.four,0);
+	this.styleSheet.insertRule(Config.sceneSize.two,0);
 
 	this.viewport = document.createElement('div');
 	this.viewport.setAttribute('id','content');
@@ -38,6 +38,7 @@ var Editor = function (  ) {
 
 		refreshAvaiableGames: new Signal(),
 		windowResize: new Signal(),
+		sceneResize: new Signal(),
 
 		cameraChanged: new Signal(),
 		objectSelected: new Signal(),
@@ -145,7 +146,7 @@ Editor.prototype = {
 				currScene.userData.element.parentElement.style.display = 'none';
 			}
 			this.setSceneSize(Config.sceneSize.fullScreen);
-			this.signals.renderRequired.dispatch();
+			// this.signals.renderRequired.dispatch();
 			
 		}
 
@@ -155,7 +156,7 @@ Editor.prototype = {
 		for ( var currScene of this.scenes ) {
 			currScene.userData.element.parentElement.style.display = '';
 		}
-		this.signals.renderRequired.dispatch();
+		// this.signals.renderRequired.dispatch();
 	},
 
 	createSceneContainer:function(sceneName,scene){
@@ -580,8 +581,11 @@ Editor.prototype = {
 		// scene.name = i;
 		// CREATE PERSPECTIVE CAMERA
 		var camera = new THREE.PerspectiveCamera( 50, 1);
+
+		
 		// camera.position.y = 1;
 		camera.position.z = 1.75;
+		
 		scene.userData.camera = camera;
 
 		// ADD LIGHT
@@ -603,6 +607,12 @@ Editor.prototype = {
 	
 		scene.userData.element = element.querySelector( ".scene" );
 		scope.viewport.appendChild( element );
+
+		camera = scene.userData.camera;
+		var dom = scene.userData.element;
+
+		camera.aspect = dom.offsetWidth / dom.offsetHeight;
+		camera.updateProjectionMatrix();
 
 		// ADD ORBIT CONTROLS
 		var orbitControls = new THREE.OrbitControls( scene.userData.camera, scene.userData.element );
@@ -745,7 +755,7 @@ Editor.prototype = {
 	setSceneSize: function(rules){
 		this.styleSheet.deleteRule(0);
 		this.styleSheet.insertRule(rules, 0);
-		this.signals.renderRequired.dispatch();
+		this.signals.sceneResize.dispatch();
 	}
 
 };

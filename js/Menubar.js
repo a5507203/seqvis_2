@@ -24,18 +24,18 @@ var Menubar = function ( editor ) {
 	document.body.appendChild( sidebarControl );
 
 
-	var wrap = new UI.Button( ).setRight();
-	wrap.setId('wrap');
-	wrap.setStyle('padding','0px');
+	// var wrap = new UI.Button( ).setRight();
+	// wrap.setId('wrap');
+	// wrap.setStyle('padding','0px');
 
-	var label = new UI.Label('=');
-	label.setAtr('for','sideToggle');
-	label.setId('sideMenuControl');
-	wrap.add(label);
+	// var label = new UI.Label('=');
+	// label.setAtr('for','sideToggle');
+	// label.setId('sideMenuControl');
+	// wrap.add(label);
 
 
 
-	container.add (wrap );
+	// container.add (wrap );
 
 
 

@@ -29,10 +29,24 @@ var Viewport = function ( editor ) {
 	signals.addScene.add(function (sceneName, data,dim, axesName) {
 		//TODO scene name
 		editor.addScene(sceneName, data,dim, axesName);
+	
 
 	});
 
 
+	signals.sceneResize.add(function(){
+
+		scenes.forEach( function( scene ) {
+			var camera = scene.userData.camera;
+			var dom = scene.userData.element;
+
+			camera.aspect = dom.offsetWidth / dom.offsetHeight;
+			camera.updateProjectionMatrix();
+			// render(scene);
+	
+		});
+		renderAll();
+	});
 
 	signals.windowResize.add( function () {
 
@@ -99,30 +113,34 @@ var Viewport = function ( editor ) {
 		scenes.forEach( function( scene ) {
 
 		
-			var element = scene.userData.element;
-			if(element.style.display == 'none') return;
-			// get its position relative to the page's viewport
-			var rect = element.getBoundingClientRect();
-			// check if it's offscreen. If so skip it
-			if ( rect.bottom < 0 || rect.top  > renderer.domElement.clientHeight ||
-					rect.right  < 0 || rect.left > renderer.domElement.clientWidth ) {
-				return;  // it's off screen
-			}
-			// set the viewport
-			var width  = rect.right - rect.left;
-			var height = rect.bottom - rect.top;
-			var left   = rect.left;
-			var top    = rect.top;
-			renderer.setViewport( left, top, width, height );
-			renderer.setScissor( left, top, width, height );
-			var camera = scene.userData.camera;
-			//camera.aspect = width / height; // not changing in this example
-			//camera.updateProjectionMatrix();
-			//scene.userData.controls.update();
-			renderer.render( scene, camera );
+			render(scene);
 		});
 		
 
+	}
+	function render(scene){
+		console.log(scene);
+		var element = scene.userData.element;
+		if(element.style.display == 'none') return;
+		// get its position relative to the page's viewport
+		var rect = element.getBoundingClientRect();
+		// check if it's offscreen. If so skip it
+		if ( rect.bottom < 0 || rect.top  > renderer.domElement.clientHeight ||
+		rect.right  < 0 || rect.left > renderer.domElement.clientWidth ) {
+		return;  // it's off screen
+		}
+		// set the viewport
+		var width  = rect.right - rect.left;
+		var height = rect.bottom - rect.top;
+		var left   = rect.left;
+		var top    = rect.top;
+		renderer.setViewport( left, top, width, height );
+		renderer.setScissor( left, top, width, height );
+		var camera = scene.userData.camera;
+		//camera.aspect = width / height; // not changing in this example
+		//camera.updateProjectionMatrix();
+		//scene.userData.controls.update();
+		renderer.render( scene, camera );
 	}
 
 
