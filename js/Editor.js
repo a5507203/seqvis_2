@@ -177,14 +177,14 @@ Editor.prototype = {
 
 		var toggleAxesButton = document.createElement('button');
 		toggleAxesButton.setAttribute('class','optionButton');
-		toggleAxesButton.style['background-image'] = 'url(/image/axes.png)';
+		toggleAxesButton.style['background-image'] = 'url(./image/axes.png)';
 		footRow.appendChild(toggleAxesButton).onclick = function() {
 			scope.signals.hideChild.dispatch(scene, 'axes');
 		};;
 
 		var toggleWireframeButton = document.createElement('button');
 		toggleWireframeButton.setAttribute('class','optionButton');
-		toggleWireframeButton.style['background-image'] = 'url(/image/triangle.png)';
+		toggleWireframeButton.style['background-image'] = 'url(./image/triangle.png)';
 		footRow.appendChild(toggleWireframeButton);
 		toggleWireframeButton.onclick = function() {
 			scope.signals.hideChild.dispatch(scene, 'wireframe');
@@ -193,7 +193,7 @@ Editor.prototype = {
 
 		var toggleLabelButton = document.createElement('button');
 		toggleLabelButton.setAttribute('class','optionButton');
-		toggleLabelButton.style['background-image'] = 'url(/image/acgt.png)';
+		toggleLabelButton.style['background-image'] = 'url(./image/acgt.png)';
 		toggleLabelButton.onclick = function() {
 			scope.signals.hideChild.dispatch(scene, 'labels');
 		};
@@ -202,7 +202,7 @@ Editor.prototype = {
 		var zoominButton = document.createElement('button');
 		zoominButton.setAttribute('class','optionButton');
 		// zoominButton.innerText ='full screen';
-		zoominButton.style['background-image'] = 'url(/image/resize.png)';
+		zoominButton.style['background-image'] = 'url(./image/resize.png)';
 		
 		zoominButton.onclick = function(){
 			if ( scope.fullScreenMode == 0 ) {
@@ -220,7 +220,7 @@ Editor.prototype = {
 		var closeButton = document.createElement('button');
 		closeButton.setAttribute('class','optionButton');
 		// closeButton.innerText =String.fromCodePoint(0x2716);
-		closeButton.style['background-image'] = 'url(/image/cross.png)';
+		closeButton.style['background-image'] = 'url(./image/cross.png)';
 		closeButton.onclick = function(){
 			//TODO signal based or not
 			scope.deleteScene(listItem,scene.uuid);
