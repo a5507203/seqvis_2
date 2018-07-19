@@ -14,11 +14,7 @@ var Viewport = function ( editor ) {
 	renderer.setClearColor( 0xffffff, 1 );
 	renderer.setPixelRatio( window.devicePixelRatio );
 
-
-
 	var sceneHelpers = editor.sceneHelpers;
-	// var objects = editor.objects;
-
 
 	//SIGNALS
 	signals.addScene.add(function (sceneName, data,dim, axesName) {
@@ -70,7 +66,6 @@ var Viewport = function ( editor ) {
 	} );
 
 
-
 	signals.hideChild.add(function(parent, childName){
 		var child;
 		console.log(parent,childName);
@@ -80,7 +75,6 @@ var Viewport = function ( editor ) {
 		
 		else if(childName == 'labels') child = parent.children[1].children[1].children[1];
 		
-
 		if( child.visible == true) child.visible = false;
 		else child.visible = true;
 		renderAll();
@@ -116,6 +110,8 @@ var Viewport = function ( editor ) {
 		
 
 	}
+
+	
 	function render(scene){
 		var element = scene.userData.element;
 		if(element.style.display == 'none') return;

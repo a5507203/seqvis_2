@@ -96,7 +96,7 @@ Sidebar.Plot = function ( editor ) {
 
 
 	signals.dataPrepared.add(function( ){
-		
+		console.log('dataPrepared');
 		var singleCoordinates = getCoordinates(editor.inputData,'allPositionFreq' ,['A','C','G','T']);
 
 		signals.addScene.dispatch(viewType.allPositionFreq, singleCoordinates,['A','C','G','T'],['A','C','G','T']);
@@ -110,8 +110,12 @@ Sidebar.Plot = function ( editor ) {
 		var thirdPosCoordinates = getCoordinates(editor.inputData,'thirdPositionFreq', ['A','C','G','T']);
 		signals.addScene.dispatch(viewType.thirdPositionFreq,thirdPosCoordinates,['A','C','G','T'],['A','C','G','T']);
 		
-
 	});
+
+	var data = localStorage.getItem('file');
+	var type = localStorage.getItem('type');
+	if(data) signals.fileLoaded.dispatch(data,type);
+	localStorage.clear();
 	return container;
 
 };

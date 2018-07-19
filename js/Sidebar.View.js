@@ -4,10 +4,7 @@ Sidebar.View = function ( editor ) {
 
 	var container = new UI.Panel();
 	var signals = editor.signals;
-	// var inputData = null;
 	container.add( new UI.Break(),new UI.Break());
-
-
 
 	//SEARCH BY NAME
 	var searchRow = new UI.Row();
@@ -27,24 +24,19 @@ Sidebar.View = function ( editor ) {
 	container.add( parameters );
 
 
-
 	signals.objectSelected.add( function ( objects ){
 
-		// console.log(editor.inputData.single[name]);
 		updateInfoGui( objects );
 	});
 
 	function updateInfoGui(objects){
 
-
-	
 		parameters.clear();
 		var objectNameSet = new Set();
 		parameters.add( new UI.Break());
 
 		parameters.add(new UI.HorizontalRule());
 		parameters.add( new UI.Break());
-		
 
 		for ( let object of objects){
 			if(objectNameSet.has(object.name)) continue;
@@ -126,10 +118,7 @@ Sidebar.View = function ( editor ) {
 	}
 
 
-	var data = localStorage.getItem('file');
-	var type = localStorage.getItem('type');
-	if(data) signals.fileLoaded.dispatch(data,type);
-	localStorage.clear();
+
 	return container;
 
 };

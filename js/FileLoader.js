@@ -47,6 +47,7 @@ FileLoader.prototype = {
     },
 
     loadDataString:function(contents,type){
+        console.log(type);
         
         if(type=='fasta'){
             this.dataPreprocessFasta(contents);
@@ -54,6 +55,7 @@ FileLoader.prototype = {
         }
         else if(type=='nex'){
             this.dataPreprocessNex(contents);
+ 
             this.signals.dataPrepared.dispatch();
         }
         else if(type=='phy'){
