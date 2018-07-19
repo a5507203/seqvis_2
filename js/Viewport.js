@@ -20,37 +20,23 @@ var Viewport = function ( editor ) {
 	// var objects = editor.objects;
 
 
-	// object picking
-
-
-
-
 	//SIGNALS
 	signals.addScene.add(function (sceneName, data,dim, axesName) {
-		//TODO scene name
 		editor.addScene(sceneName, data,dim, axesName);
+	});
 	
-
+	signals.pointSizeChanged.add(function(size){
+		editor.changePointSize(size);
 	});
 
-
 	signals.sceneResize.add(function(){
-
-		scenes.forEach( function( scene ) {
-			var camera = scene.userData.camera;
-			var dom = scene.userData.element;
-
-			camera.aspect = dom.offsetWidth / dom.offsetHeight;
-			camera.updateProjectionMatrix();
-			// render(scene);
-	
-		});
+		sceneResize();
 		renderAll();
 	});
 
 	signals.windowResize.add( function () {
 
-
+		sceneResize();
 		var width = canvas.clientWidth;
 		var height = canvas.clientHeight;
 		if ( canvas.width !== width || canvas.height !== height ) {
@@ -101,6 +87,18 @@ var Viewport = function ( editor ) {
 	
 
 	});
+
+	function sceneResize(){
+		scenes.forEach( function( scene ) {
+			var camera = scene.userData.camera;
+			var dom = scene.userData.element;
+
+			camera.aspect = dom.offsetWidth / dom.offsetHeight;
+			camera.updateProjectionMatrix();
+			// render(scene);
+	
+		});
+	}
 
 	function renderAll() {
 

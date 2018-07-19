@@ -64,19 +64,6 @@ FileLoader.prototype = {
     
     dataPreprocessFasta : function( data ){
         var words = data.split(/>/);
-        var input = {
-            single:{},
-            first:{},
-            second:{},
-            third:{},
-
-            rawData:{},
-            singleSeq:{},
-            firstSeq:{},
-            secondSeq:{},
-            thirdSeq:{}
-        };
-        
         for(var i=0;i<words.length;i++){
             if(words[i]=="") continue;
             var firstOccur = words[i].indexOf('\n');
@@ -85,59 +72,25 @@ FileLoader.prototype = {
             var seq = words[i].substring( firstOccur+1, words[i].length);
             seqName = seqName.replace(/\s/g,"");
             seq = seq.replace(/\s/g,"");
-            // console.log(seq)
-            // console.log(JSON.stringify(seq));
-            currFreqs = this.getFrequency(seq);
-            // storeData(input, currFreqs);
-        
-            input.single[seqName] = currFreqs[0];
-            input.first[seqName] = currFreqs[1];
-            input.second[seqName] = currFreqs[2];
-            input.third[seqName] = currFreqs[3];
 
-            input.rawData[seqName] = seq;
-            input.singleSeq[seqName] = currFreqs[4];
-            input.firstSeq[seqName] = currFreqs[5];
-            input.secondSeq[seqName] = currFreqs[6];
-            input.thirdSeq[seqName] = currFreqs[7];
+            this.editor.inputData[seqName] = this.getSeqInfo(seq);
+        
         }
-    
-        this.editor.inputData = input;
-        // this.signals.dataPrepared.dispatch();
+        console.log(this.editor.inputData);
+
         
     },
     
     dataPreprocessPhy : function(data){
         var words = data.split(/\n/);
-        var input = {
-            single:{},
-            first:{},
-            second:{},
-            third:{},
 
-            rawData:{},
-            singleSeq:{},
-            firstSeq:{},
-            secondSeq:{},
-            thirdSeq:{}
-        };
         var seqName="";
         var seq="";
         for(var i=1; i< words.length;i++){
           var line = words[i].replace(/\r/g,"").split(/ /);
           if(line.length>1){
               if(seqName!=""){
-                var currFreqs = this.getFrequency(seq);
-                input.single[seqName] = currFreqs[0];
-                input.first[seqName] = currFreqs[1];
-                input.second[seqName] = currFreqs[2];
-                input.third[seqName] = currFreqs[3];
-    
-                input.rawData[seqName] = seq;
-                input.singleSeq[seqName] = currFreqs[4];
-                input.firstSeq[seqName] = currFreqs[5];
-                input.secondSeq[seqName] = currFreqs[6];
-                input.thirdSeq[seqName] = currFreqs[7];
+                this.editor.inputData[seqName] = this.getSeqInfo(seq);
               }
               seqName = line[0];
               seq = "";
@@ -152,26 +105,14 @@ FileLoader.prototype = {
           }
                 
         }
-        this.editor.inputData = input;
-        // this.signals.dataPrepared.dispatch();
+
         
     },
     
     dataPreprocessNex : function(data){
         var words = data.split(/MATRIX/);
         var result = words[1].split(/\n/);
-        var input = {
-            single:{},
-            first:{},
-            second:{},
-            third:{},
 
-            rawData:{},
-            singleSeq:{},
-            firstSeq:{},
-            secondSeq:{},
-            thirdSeq:{}
-        };
         var seq="";
         var seqName ="";
         for(var i=0; i< result.length;i++){
@@ -183,143 +124,148 @@ FileLoader.prototype = {
                 for(var j=1;j<line.length;j++){
                     if(line[j]!="") seq +=line[j];
                 }
-                var currFreqs = this.getFrequency(seq);
-                input.single[seqName] = currFreqs[0];
-                input.first[seqName] = currFreqs[1];
-                input.second[seqName] = currFreqs[2];
-                input.third[seqName] = currFreqs[3];
-    
-                input.rawData[seqName] = seq;
-                input.singleSeq[seqName] = currFreqs[4];
-                input.firstSeq[seqName] = currFreqs[5];
-                input.secondSeq[seqName] = currFreqs[6];
-                input.thirdSeq[seqName] = currFreqs[7];
+                this.editor.inputData[seqName] = this.getSeqInfo(seq);
                 seq="";
             }
-        }
-        
-        this.editor.inputData = input;
-        // this.signals.dataPrepared.dispatch();
+        }  
+        // this.editor.inputData = input;
+
     },
 
-    getFrequency : function( data ) {
+    getSeqInfo : function( data ) {
         //orginal
-        var fre={};
-        fre['A']=0;
-        fre['C']=0;
-        fre['G']=0;
-        fre['T']=0;
-        freSeq = '';
+        var allPositionFreq={};
+        allPositionFreq['A']=0;
+        allPositionFreq['C']=0;
+        allPositionFreq['G']=0;
+        allPositionFreq['T']=0;
+     
         
         //first position
-        var fir ={};
-        fir['A'] = 0;
-        fir['C'] = 0;
-        fir['G'] = 0;
-        fir['T'] = 0;
-        firstSeq = '';
+        var firstPositionFreq ={};
+        firstPositionFreq['A'] = 0;
+        firstPositionFreq['C'] = 0;
+        firstPositionFreq['G'] = 0;
+        firstPositionFreq['T'] = 0;
+    
         //second position
-        var sec ={};
-        sec['A'] = 0;
-        sec['C'] = 0;
-        sec['G'] = 0;
-        sec['T'] = 0;
-        secondSeq = '';
+        var secondPositionFreq ={};
+        secondPositionFreq['A'] = 0;
+        secondPositionFreq['C'] = 0;
+        secondPositionFreq['G'] = 0;
+        secondPositionFreq['T'] = 0;
+   
         //third position
-        var thir ={};
-        thir['A'] = 0;
-        thir['C'] = 0;
-        thir['G'] = 0;
-        thir['T'] = 0;
-        thirdSeq = '';
+        var thirdPositionFreq ={};
+        thirdPositionFreq['A'] = 0;
+        thirdPositionFreq['C'] = 0;
+        thirdPositionFreq['G'] = 0;
+        thirdPositionFreq['T'] = 0;
+     
 
-        var firstLen = 0;
-        var secondLen = 0;
-        var thirdLen = 0;
+        var firstPositionLen = 0;
+        var secondPositionLen = 0;
+        var thirdPositionLen = 0;
+        var unknownSeqNum = 0;
+        var otherSeqNum = 0;
+        var gapNum = 0;
         var weight; 
         for(var i=0;i<data.length;i++){
             currCode = data[i];
-            if (/^[A-Z]$/i.test(currCode)==false) continue;
-           
-            if(currCode =='A' || currCode=='G' || currCode == 'C'|| currCode == 'T'){
-                
-                fre[currCode]++;
-                freSeq += currCode;
+            // if (/^[A-Z]$/i.test(currCode)==false) continue;
+        
+            //allPositionFreq[currCode]++;
+            if( currCode == 'N' ){
+                unknownSeqNum += 1;
+                continue;
+            }
+            if( currCode == ' '){
+                gapNum += 1;
+                continue;
+            }
+            else if( currCode == 'A' || currCode == 'G' || currCode == 'C'|| currCode == 'T' ){
+                //TODO gap also counts to total length?
+                allPositionFreq[currCode]++;
+          
                 if(i%3==0){
-                    firstLen += 1; 
-                    fir[currCode]++;
-                    firstSeq += currCode;
+                    firstPositionLen += 1; 
+                    firstPositionFreq[currCode]++;
                 }
                 else if(i%3==1){
-                    secondLen += 1; 
-                    sec[currCode]++;
-                    secondSeq += currCode;
+                    secondPositionLen += 1; 
+                    secondPositionFreq[currCode]++;
                 }
                 else if(i%3==2){
-                    thirdLen += 1; 
-                    thir[currCode]++;
-                    thirdSeq += currCode;
+                    thirdPositionLen += 1; 
+                    thirdPositionFreq[currCode]++;
                 }
                  
             }
             else {
-                fre['A']+=0.25;
-                fre['G']+=0.25;
-                fre['C']+=0.25;
-                fre['T']+=0.25;
-                freSeq += currCode;
+                otherSeqNum += 1;
+                allPositionFreq['A']+=0.25;
+                allPositionFreq['G']+=0.25;
+                allPositionFreq['C']+=0.25;
+                allPositionFreq['T']+=0.25;
                 if(i%3==0){
-                    firstLen += 1; 
-                    fir['A']+=0.25;
-                    fir['G']+=0.25;
-                    fir['C']+=0.25;
-                    fir['T']+=0.25;
-                    firstSeq += currCode;
+                    firstPositionLen += 1; 
+                    firstPositionFreq['A']+=0.25;
+                    firstPositionFreq['G']+=0.25;
+                    firstPositionFreq['C']+=0.25;
+                    firstPositionFreq['T']+=0.25;
                 }
                 else if(i%3==1){
-                    secondLen += 1; 
-                    sec['A']+=0.25;
-                    sec['G']+=0.25;
-                    sec['C']+=0.25;
-                    sec['T']+=0.25;
-                    secondSeq += currCode;
+                    secondPositionLen += 1; 
+                    secondPositionFreq['A']+=0.25;
+                    secondPositionFreq['G']+=0.25;
+                    secondPositionFreq['C']+=0.25;
+                    secondPositionFreq['T']+=0.25;
                 }
                 else if(i%3==2){
-                    thirdLen += 1; 
-                    thir['A']+=0.25;
-                    thir['G']+=0.25;
-                    thir['C']+=0.25;
-                    thir['T']+=0.25;               
-                    thirdSeq += currCode;
+                    thirdPositionLen += 1; 
+                    thirdPositionFreq['A']+=0.25;
+                    thirdPositionFreq['G']+=0.25;
+                    thirdPositionFreq['C']+=0.25;
+                    thirdPositionFreq['T']+=0.25;               
                 }
 
              }
 
         }
         // console.log(data.length)
-        var totalLen = firstLen+secondLen+thirdLen;
-        fre['A'] /= totalLen;
-        fre['C'] /= totalLen;
-        fre['G'] /= totalLen;
-        fre['T'] /= totalLen;
+        var allPositionLengh = data.length-unknownSeqNum;
+        allPositionFreq['A'] /= allPositionLengh;
+        allPositionFreq['C'] /= allPositionLengh;
+        allPositionFreq['G'] /= allPositionLengh;
+        allPositionFreq['T'] /= allPositionLengh;
 
 
-        fir['A'] /= firstLen;
-        fir['C'] /= firstLen;
-        fir['G'] /= firstLen;
-        fir['T'] /= firstLen;
+        firstPositionFreq['A'] /= firstPositionLen;
+        firstPositionFreq['C'] /= firstPositionLen;
+        firstPositionFreq['G'] /= firstPositionLen;
+        firstPositionFreq['T'] /= firstPositionLen;
 
-        sec['A'] /= secondLen;
-        sec['C'] /= secondLen;
-        sec['G'] /= secondLen;
-        sec['T'] /= secondLen;
+        secondPositionFreq['A'] /= secondPositionLen;
+        secondPositionFreq['C'] /= secondPositionLen;
+        secondPositionFreq['G'] /= secondPositionLen;
+        secondPositionFreq['T'] /= secondPositionLen;
 
-        thir['A'] /= thirdLen;
-        thir['C'] /= thirdLen;
-        thir['G'] /= thirdLen;
-        thir['T'] /= thirdLen;
-        // console.log([fre,fir,sec,thir])
-        return [fre,fir,sec,thir,freSeq,firstSeq,secondSeq,thirdSeq];
+        thirdPositionFreq['A'] /= thirdPositionLen;
+        thirdPositionFreq['C'] /= thirdPositionLen;
+        thirdPositionFreq['G'] /= thirdPositionLen;
+        thirdPositionFreq['T'] /= thirdPositionLen;
+
+
+        return {
+                allPositionFreq:allPositionFreq,
+                firstPositionFreq:firstPositionFreq,
+                secondPositionFreq:secondPositionFreq,
+                thirdPositionFreq:thirdPositionFreq,
+                unknownSeqNum:unknownSeqNum,
+                gapNum:gapNum,
+                otherSeqNum:otherSeqNum,
+                totalLen:data.length
+                };
     },
     
 

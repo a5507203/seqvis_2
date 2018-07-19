@@ -4,26 +4,26 @@ var ROOTTHREE = 1.7321;
 var ROOTSIX = 2.4495;
 
 // group ('A,C,G,T'  'AC,GT')
-function getCoordinates(  points, groups, axesName ) {
+function getCoordinates(  seqInfo, position, groups, axesName ) {
           
     if (groups.length == 2) {
           console.log(1);
-        return oneDimCoordinates(points, groups, axesName);
+        return oneDimCoordinates(seqInfo, position, groups, axesName);
     }
     else if (groups.length == 3) {
                 console.log(3);
-        return twoDimCoordinates(points, groups, axesName);
+        return twoDimCoordinates(seqInfo, position, groups, axesName);
     }
     else if (groups.length == 4) {
         console.log(4);
-        return threeDimCoordinates(points);
+        return threeDimCoordinates(seqInfo,position);
     }
     
 // var y =3√2t+3√6f.
 
 }
 
-function oneDimCoordinates(points, groups, axesName)  {
+function oneDimCoordinates(seqInfo, position, groups, axesName)  {
     
     var data = {};
     
@@ -32,10 +32,11 @@ function oneDimCoordinates(points, groups, axesName)  {
     var firstAxes = axesName[0];
     var secondAxes = axesName[1];
         
-    for( let [name,point] of Object.entries(points) )  {
+    for( let [name,seq] of Object.entries(seqInfo) )  {
         
         var x = 0;
-        
+        var point = seq[position];
+
         for ( let axes of firstVertex) { 
             x += point[axes];
         }
@@ -55,7 +56,7 @@ function oneDimCoordinates(points, groups, axesName)  {
     
 }
 // t l r
-function twoDimCoordinates(points, groups,axesName)  {
+function twoDimCoordinates(seqInfo, position, groups, axesName)  {
     
     var data = {};
 
@@ -68,12 +69,13 @@ function twoDimCoordinates(points, groups,axesName)  {
     var secondAxes = axesName[1];
     var thirdAxes = axesName[2];
 
-    for( let [name,point] of Object.entries(points) ) {
+    for( let [name,seq] of Object.entries(seqInfo) ) {
         
         var t = 0;
         var l = 0;
         var r = 0;
-        
+        var point = seq[position];
+
         for ( let axes of firstVertex) { t += point[axes]; }
         for ( let axes of secondVertex) { l += point[axes]; }
         for ( let axes of thirdVertex) { r += point[axes]; }
@@ -100,12 +102,12 @@ function twoDimCoordinates(points, groups,axesName)  {
 //A  C  G  T
 
 //t  l  r  f
-function threeDimCoordinates(points)  {
+function threeDimCoordinates(seqInfo,position)  {
     
     var data = {};
 
-    for( let [name,point] of Object.entries(points) )   {
-        
+    for( let [name,seq] of Object.entries(seqInfo) )   {
+        var point = seq[position];
         var x = (point.G + 1 - point.C)/2;
         var y = ROOTSIX*point.A/3;
         var z = ROOTTHREE*point.T/2 + ROOTTHREE*point.A/6;

@@ -21,7 +21,7 @@ var Editor = function (  ) {
 	document.body.appendChild(this.viewport);
 
 	this.addNewEdgeMode = 0;
-	this.inputData  = null;
+	this.inputData  = {};
 	this.selectionMode = 0;
 
 	var Signal = signals.Signal;
@@ -44,7 +44,7 @@ var Editor = function (  ) {
 		objectSelected: new Signal(),
 		objectAdded: new Signal(),
 		objectChanged: new Signal(),
-
+		pointSizeChanged: new Signal(),
 		refreshSidebarObjectProperties: new Signal(),
 
 		addScene: new Signal(),
@@ -79,7 +79,7 @@ Editor.prototype = {
 		if(this.selectionMode == 0) this.crossSelect( object );
 		else this.singleSelect( object );
 
-		this.signals.objectSelected.dispatch( object );
+		this.signals.objectSelected.dispatch( [object] );
 		this.signals.renderRequired.dispatch();
 	},
 
@@ -92,21 +92,35 @@ Editor.prototype = {
 		for( let sprite of this.selected ) sprite.material.color.set(Config.spriteColor);
 		this.selected = [];
 		this.crossSelect( object );
-		if(this.selected.length != 0) this.signals.objectSelected.dispatch( this.selected[0]  );
+		if(this.selected.length != 0) this.signals.objectSelected.dispatch( this.selected  );
 		this.signals.renderRequired.dispatch();
 
+
+	},
+	changePointSize: function( size ) {
+		for( let scene of this.scenes) {
+			for ( var i = 0 ; i <scene.children[1].children[2].children.length; i+=1){
+				sprite = scene.children[1].children[2].children[i];
+				scene.children[1].children[2].children[i].scale.set(size,size,size);
+				sprite.updateMatrixWorld( true );
+			}
+		}
+		this.signals.renderRequired.dispatch();
 
 	},
 
 	crossSelect: function ( object ) {
 		var scope  = this;
 		for ( let scene of this.scenes ) {
-			scene.children[1].children[2].traverse( function(sprite){
-				if (sprite.name == object.name){
+			for ( var i = 0 ; i <scene.children[1].children[2].children.length; i+=1){
+				
+				sprite = scene.children[1].children[2].children[i];
+				
+				if (sprite.name.toUpperCase().includes(object.name.toUpperCase())){
 					scope.selected.push(sprite);
 					sprite.material.color.set(0x00ff00);
 				}
-			});
+			}
 
 		}
 		
@@ -580,26 +594,7 @@ Editor.prototype = {
 		var scene = new THREE.Scene();
 		// scene.name = i;
 		// CREATE PERSPECTIVE CAMERA
-		var camera = new THREE.PerspectiveCamera( 50, 1);
 
-		
-		// camera.position.y = 1;
-		camera.position.z = 1.75;
-		
-		scene.userData.camera = camera;
-
-		// ADD LIGHT
-		var light = new THREE.AmbientLight( 0x404040 ); // soft white light
-		scene.add( light );
-		// scene.add( new THREE.HemisphereLight( 0xaaaaaa, 0x444444 ) );
-		// scene.add( new THREE.HemisphereLight( 0xaaaaaa, 0x444444 ) );
-		// var light = new THREE.DirectionalLight( 0xffffff, 0.5 );
-		// light.position.set( 1, 1, 1 );
-		// scene.add( light );
-		console.log(scene);
-		scene.background = new THREE.Color(0x030303);
-
-		scope.scenes.push( scene );
 
 		// CREATE ELEMENT IN HTML
 		// var element = this.createSceneContainer(dim.join(),scene);
@@ -607,9 +602,22 @@ Editor.prototype = {
 	
 		scene.userData.element = element.querySelector( ".scene" );
 		scope.viewport.appendChild( element );
+		var dom = scene.userData.element;
+		
+		var camera = new THREE.PerspectiveCamera( 50, 1);
+		camera.position.z = 1.75;
+		
+		scene.userData.camera = camera;
+
+		// ADD LIGHT
+		var light = new THREE.AmbientLight( 0x404040 ); // soft white light
+		scene.add( light );
+		console.log(scene);
+		scene.background = new THREE.Color(0x030303);
+		scope.scenes.push( scene );
 
 		camera = scene.userData.camera;
-		var dom = scene.userData.element;
+		
 
 		camera.aspect = dom.offsetWidth / dom.offsetHeight;
 		camera.updateProjectionMatrix();
