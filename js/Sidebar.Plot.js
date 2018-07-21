@@ -22,7 +22,7 @@ Sidebar.Plot = function ( editor ) {
 		'allPositionFreq':'All position',
 		'firstPositionFreq':'1st codon position',
 		'secondPositionFreq':'2nd codon position',
-		'thirdPositionFreq':'3st codon position'
+		'thirdPositionFreq':'3rd codon position'
 	};
 	var viewOptionRow = new UI.Row();
 	var viewOptions = new UI.Select().setOptions( viewType ).setWidth( '120px' ).setValue('allPositionFreq').setFontSize( '12px' );
