@@ -6,6 +6,7 @@ var Editor = function (  ) {
 
 
 	this.fullScreenMode = 0;
+	this.animationMode = 0;
 	this.canvas = document.createElement('canvas');
 	this.canvas.setAttribute('id', 'c');
 	document.body.appendChild(this.canvas);
@@ -17,12 +18,14 @@ var Editor = function (  ) {
 
 	this.viewport = document.createElement('div');
 	this.viewport.setAttribute('id','content');
+	
 
 	document.body.appendChild(this.viewport);
 
 	this.addNewEdgeMode = 0;
 	this.inputData  = {};
 	this.selectionMode = 0;
+	this.animationDict= {};
 
 	var Signal = signals.Signal;
 
@@ -51,6 +54,8 @@ var Editor = function (  ) {
 		setSceneSize: new Signal(),
 		deleteScene: new Signal(),	
 		fullScreenMode: new Signal(),
+		animationRequired: new Signal(),
+		stopAnimations: new Signal(),
 		renderRequired: new Signal(),
 		fileLoaded: new Signal(),
 		dataPrepared: new Signal(),
@@ -69,8 +74,7 @@ var Editor = function (  ) {
 Editor.prototype = {
 
 	select: function ( object ) {
-		// console.log('prev selection',this.selected[0]);
-		// console.log('curr',object.name)
+
 		if (( this.selected[0] != undefined && this.selectionMode == 0 && this.selected[0].name == object.name )||( this.selected[0] != undefined && this.selectionMode == 1 && this.selected[0].uuid == object.uuid ) )return;
 
 		for( let sprite of this.selected ) sprite.material.color.set(Config.spriteColor);
@@ -138,11 +142,12 @@ Editor.prototype = {
 	deleteScene:function(listItem,uuid){
 	
 		var index = 0;
-		console.log(this.scenes.length);
+	
 		for( var scene of this.scenes){
 			if(scene.uuid != uuid) index += 1;
 			else break;
 		}
+		TWEEN.remove(this.scenes[index].userData.animation);
 		this.scenes.splice(index, 1);
 		this.viewport.removeChild(listItem);
 		this.signals.renderRequired.dispatch();
@@ -252,6 +257,7 @@ Editor.prototype = {
 
 	drawGraph : function( objects, data, dim, axesNames ) {
 		
+		var graphContainer = new THREE.Group();
 		var graphGroup = new THREE.Group();
 		if(dim.length == 2) graphGroup.position.set(-0.5, 0, 0);
 		if(dim.length == 3) graphGroup.position.set(-0.5, -ROOTTHREE/6, 0);
@@ -260,7 +266,8 @@ Editor.prototype = {
 		graphGroup.add(this.drawWireframe( dim.length-1 ));
 		graphGroup.add(this.drawAxes( dim, axesNames ));
 		graphGroup.add(this.drawData( objects, data ));
-		return graphGroup;	
+		graphContainer.add(graphGroup);
+		return graphContainer;	
 		
 	}, 
 
@@ -496,6 +503,33 @@ Editor.prototype = {
 
 	},
 
+	createAnimations: function(){
+		TWEEN.removeAll();
+		for ( var scene of this.scenes){
+			this.createAnimation(scene.children[1]);
+
+		}
+
+	},
+	createAnimation: function(container){
+		var tween = new TWEEN.Tween(container.rotation.clone())
+		.to(new THREE.Euler(0,container.rotation.y+6.28, 0), 7000)
+		.onUpdate(function() {
+			
+			container.rotation.copy(new THREE.Euler(this.x,this.y,this.z) );
+			container.updateMatrixWorld( true );
+		}).repeat(Infinity);
+		if(this.animationMode == 1) tween.start();
+	},
+
+	startAnimations: function(){
+		for(let scene of this.scenes){
+			// console.log(scene)
+			scene.userData.animation.start();
+		}
+
+	},
+
 	drawAxesLabels: function(axesNames,callback){
 		
 		var scope = this;
@@ -557,7 +591,7 @@ Editor.prototype = {
 	},
 
 	drawData: function( objects, data ){
-			console.log(data)
+
 		var group = new THREE.Group();
 		group.name  = 'data';
 		group.position.set(0, 0, 0);
@@ -605,14 +639,16 @@ Editor.prototype = {
 		var dom = scene.userData.element;
 		
 		var camera = new THREE.PerspectiveCamera( 50, 1);
+		camera.position.x = 0;
 		camera.position.z = 1.75;
 		
 		scene.userData.camera = camera;
+		
 
 		// ADD LIGHT
 		var light = new THREE.AmbientLight( 0x404040 ); // soft white light
 		scene.add( light );
-		console.log(scene);
+	
 		scene.background = new THREE.Color(0x030303);
 		scope.scenes.push( scene );
 
@@ -624,9 +660,10 @@ Editor.prototype = {
 
 		// ADD ORBIT CONTROLS
 		var orbitControls = new THREE.OrbitControls( scene.userData.camera, scene.userData.element );
-		orbitControls.minDistance = 0.25;
+		orbitControls.minDistance = 0.1;
 		orbitControls.maxDistance = 2;
 		orbitControls.enablePan = false;
+		orbitControls.autoRotate = false;
 		// orbitControls.enableZoom = false;
 		scene.userData.orbitControls = orbitControls;
 		orbitControls.addEventListener('change', function(){
@@ -635,7 +672,9 @@ Editor.prototype = {
 		//ADD OBJECT SELECTION CONTROLS
 		scope.objectPicking(scene);
 		//ADD AXIS AND DATA
-		scene.add( scope.drawGraph(scene.userData.objects, data, dim, axesNames ) );
+		var container = scope.drawGraph(scene.userData.objects, data, dim, axesNames );
+		scene.add( container );
+		scene.userData.animation = scope.createAnimation(container);
 		scope.signals.renderRequired.dispatch();
 	},
 
@@ -670,6 +709,7 @@ Editor.prototype = {
 
 		}
 
+
 		function handleClick() {
 			
 			if ( onDownPosition.distanceTo( onUpPosition ) === 0 ) {
@@ -687,7 +727,7 @@ Editor.prototype = {
 
 						
 					} else {
-						console.log(object);
+						console.log('selected',object);
 						// console.log(scope.inputData.single[])
 						scope.select( object );
 

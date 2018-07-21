@@ -98,12 +98,21 @@ var Toolbar = function ( editor ) {
 
 
 
-	// var crossSelection = new UI.Button( 'Cross Selection' ).setMarginLeft('20px');
-	// crossSelection.dom.classList.add( 'selected' );
-	// crossSelection.onClick( function () {
-	// 	signals.selectionModeChanged.dispatch( 0 );
-	// } );
-	// buttons.add( crossSelection );
+	var playButton = new UI.Button( 'play' ).setMarginLeft('20px');
+
+	playButton.onClick( function () {
+		if (playButton.dom.classList.contains( 'selected' )) {
+			playButton.dom.classList.remove( 'selected' );
+			signals.stopAnimations.dispatch( );
+
+		}
+		else{
+			playButton.dom.classList.add( 'selected' );
+			signals.animationRequired.dispatch( );
+		}
+		// signals.selectionModeChanged.dispatch( 0 );
+	} );
+	buttons.add( playButton );
 
 	// var singleSelection = new UI.Button( 'Single Selection' );
 	// singleSelection.onClick( function () {

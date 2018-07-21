@@ -2,7 +2,7 @@ var Viewport = function ( editor ) {
 
 	var signals = editor.signals;
 	var canvas = editor.canvas;
-
+	var animationLoopId;
 	var fullScreenScene = editor.fullScreenScene;
  	var container  = this.container = editor.viewport;
 	container.onscroll = function (e) {
@@ -47,6 +47,19 @@ var Viewport = function ( editor ) {
 		renderAll();
 
 	} );
+
+	signals.animationRequired.add( function () {
+		editor.animationMode = 1;
+		editor.createAnimations();
+		animate();
+
+	} );
+	signals.stopAnimations.add( function () {
+	// editor.startAnimations();
+		editor.animationMode = 0;
+		stopAnimate();
+	} );
+
 
 
 	signals.selectionModeChanged.add( function (type) {
@@ -94,8 +107,22 @@ var Viewport = function ( editor ) {
 		});
 	}
 
-	function renderAll() {
 
+	function stopAnimate() {
+
+		cancelAnimationFrame( animationLoopId );
+
+	}
+
+
+	function animate(timestamp) {
+	
+		animationLoopId = requestAnimationFrame( animate );
+		TWEEN.update(timestamp);
+		renderAll();
+	}
+
+	function renderAll() {
 
 		renderer.setClearColor( 0xffffff );
 		renderer.setScissorTest( false );
@@ -104,7 +131,6 @@ var Viewport = function ( editor ) {
 		renderer.setScissorTest( true );
 		scenes.forEach( function( scene ) {
 
-		
 			render(scene);
 		});
 		
@@ -132,7 +158,7 @@ var Viewport = function ( editor ) {
 		var camera = scene.userData.camera;
 		//camera.aspect = width / height; // not changing in this example
 		//camera.updateProjectionMatrix();
-		//scene.userData.controls.update();
+		// scene.userData.orbitControls.update();
 		renderer.render( scene, camera );
 	}
 
