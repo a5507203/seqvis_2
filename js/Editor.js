@@ -103,9 +103,9 @@ Editor.prototype = {
 	},
 	changePointSize: function( size ) {
 		for( let scene of this.scenes) {
-			for ( var i = 0 ; i <scene.children[1].children[2].children.length; i+=1){
-				sprite = scene.children[1].children[2].children[i];
-				scene.children[1].children[2].children[i].scale.set(size,size,size);
+			for ( var i = 0 ; i <scene.children[1].children[0].children[2].children.length; i+=1){
+				sprite = scene.children[1].children[0].children[2].children[i];
+				scene.children[1].children[0].children[2].children[i].scale.set(size,size,size);
 				sprite.updateMatrixWorld( true );
 			}
 		}
@@ -116,9 +116,9 @@ Editor.prototype = {
 	crossSelect: function ( object ) {
 		var scope  = this;
 		for ( let scene of this.scenes ) {
-			for ( var i = 0 ; i <scene.children[1].children[2].children.length; i+=1){
+			for ( var i = 0 ; i <scene.children[1].children[0].children[2].children.length; i+=1){
 				
-				sprite = scene.children[1].children[2].children[i];
+				sprite = scene.children[1].children[0].children[2].children[i];
 				
 				if (sprite.name.toUpperCase().includes(object.name.toUpperCase())){
 					scope.selected.push(sprite);
