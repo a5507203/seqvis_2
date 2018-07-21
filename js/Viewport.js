@@ -82,11 +82,11 @@ var Viewport = function ( editor ) {
 	signals.hideChild.add(function(parent, childName){
 		var child;
 		console.log(parent,childName);
-		if(childName == 'wireframe') child = parent.children[1].children[0];
+		if(childName == 'wireframe') child = parent.children[1].children[0].children[0];
 		
-		else if(childName == 'axes') child = parent.children[1].children[1].children[0];
+		else if(childName == 'axes') child = parent.children[1].children[0].children[1].children[0];
 		
-		else if(childName == 'labels') child = parent.children[1].children[1].children[1];
+		else if(childName == 'labels') child = parent.children[1].children[0].children[1].children[1];
 		
 		if( child.visible == true) child.visible = false;
 		else child.visible = true;

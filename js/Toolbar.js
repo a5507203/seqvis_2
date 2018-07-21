@@ -140,7 +140,7 @@ var Toolbar = function ( editor ) {
 		if( bool == true ) {
 			editor.hideOtherScenes(scene);
 			currSelected.dom.classList.remove( 'selected' );
-			this.signals.renderRequired.dispatch();
+			signals.renderRequired.dispatch();
 		}
 		else {
 			editor.displayAllScenes();
