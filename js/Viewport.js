@@ -59,6 +59,36 @@ var Viewport = function ( editor ) {
 		editor.animationMode = 0;
 		stopAnimate();
 	} );
+	
+	
+	signals.changeColorScheme.add( function ( type ) {
+			
+		editor.colorScheme = type;
+
+			
+		for ( var scene of scenes ) {
+			if(type == 0 ) scene.background =  Config.colors.SCENEDARK;
+			else scene.background =  Config.colors.SCENELIGHT;
+			
+			var wireframe = scene.children[1].children[0].children[0];
+			editor.changeBufferGeometryColorScheme(wireframe,type);
+			
+			var axes = scene.children[1].children[0].children[1].children[0];
+			editor.changeBufferGeometryColorScheme(axes,type);
+			
+			var labels = scene.children[1].children[0].children[1].children[1];
+			editor.changeSpriteColorScheme(labels,type);
+			
+			renderAll();
+		}
+
+		
+		
+		
+	
+	
+		
+	} );
 
 
 
@@ -78,6 +108,7 @@ var Viewport = function ( editor ) {
 
 	} );
 
+	signals.screenShot.add(screenShot );
 
 	signals.hideChild.add(function(parent, childName){
 		var child;
@@ -136,6 +167,21 @@ var Viewport = function ( editor ) {
 		
 
 	}
+	
+
+	
+	function screenShot(){
+		
+		var w = window.open('', '');
+		w.document.title = "Screenshot";
+		//w.document.body.style.backgroundColor = "red";
+		// var t = editor.viewport.getContext('2d');
+		// var img = new Image();
+		// // Without 'preserveDrawingBuffer' set to true, we must render now
+		// renderer.render(scenes[0], scenes[0].userData.camera);
+		// img.src = renderer.domElement.toDataURL();
+		w.document.body.appendChild(editor.viewport.toDataURL());  
+	}
 
 	
 	function render(scene){
@@ -160,6 +206,9 @@ var Viewport = function ( editor ) {
 		//camera.updateProjectionMatrix();
 		// scene.userData.orbitControls.update();
 		renderer.render( scene, camera );
+		
+		
+		
 	}
 
 

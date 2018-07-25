@@ -7,11 +7,11 @@ var Sidebar = function ( editor ) {
 
 	var viewTab = new UI.Text( 'View' ).onClick( onClick );
 	var plotTab = new UI.Text( 'Plot' ).onClick( onClick );
-	// var clusterTab  = new UI.Text( 'CLUSTER' ).onClick( onClick );
+	var settingsTab  = new UI.Text( 'Settings' ).onClick( onClick );
 	
 	var tabs = new UI.Div();
 	tabs.setId( 'tabs' );
-	tabs.add( viewTab,plotTab );
+	tabs.add( viewTab,plotTab,settingsTab );
 	//	, clusterTab, editTab
 	container.add( tabs );
 
@@ -27,11 +27,12 @@ var Sidebar = function ( editor ) {
 	container.add( plot );
 
 
-	// var editMode = new UI.Span().add(
-	// 	new Sidebar.Edit( editor )
+	var settings = new UI.Span().add(
+		new Sidebar.Settings( editor )
 
-	// );
-	// container.add( editMode );
+	);
+	
+	container.add( settings );
 
 
 	function onClick( event ) {
@@ -42,11 +43,11 @@ var Sidebar = function ( editor ) {
 
 		viewTab.setClass( '' );
 		plotTab.setClass( '' );
-		// editTab.setClass( '' );
+		settingsTab.setClass( '' );
 
 		view.setDisplay( 'none' );
 		plot.setDisplay( 'none' );
-		// editMode.setDisplay( 'none' );
+		settings.setDisplay( 'none' );
 
 		switch ( section ) {
 			case 'View':
@@ -58,10 +59,10 @@ var Sidebar = function ( editor ) {
 				plotTab.setClass( 'selected' );
 				plot.setDisplay( '' );
 				break;
-		// 	case 'CLUSTER':
-		// 		clusterTab.setClass( 'selected' );
-		// 		cluster.setDisplay( '' );
-		// 		break;
+			case 'Settings':
+				settingsTab.setClass( 'selected' );
+				settings.setDisplay( '' );
+				break;
 		}
 
 	}

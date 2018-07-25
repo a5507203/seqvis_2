@@ -113,6 +113,16 @@ var Toolbar = function ( editor ) {
 		// signals.selectionModeChanged.dispatch( 0 );
 	} );
 	buttons.add( playButton );
+	
+	
+	
+	var screenShotButton = new UI.Button( 'Scrn' ).setMarginLeft('20px');
+	
+	screenShotButton.onClick( function () {
+
+		signals.screenShot.dispatch( );
+	} );
+	buttons.add( screenShotButton );
 
 	// var singleSelection = new UI.Button( 'Single Selection' );
 	// singleSelection.onClick( function () {

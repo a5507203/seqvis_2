@@ -8,7 +8,7 @@ Sidebar.Plot = function ( editor ) {
 	container.add( new UI.Break(),new UI.Break());
 
 	var pointSizeRow = new UI.Row();
-	var pointSize = new UI.Integer().setStep(1).setRange(1,5).setValue(5).onChange(function(){
+	var pointSize = new UI.Integer().setStep(1).setRange(1,10).setValue(10).onChange(function(){
 		signals.pointSizeChanged.dispatch(pointSize.getValue()/500);
 
 	});

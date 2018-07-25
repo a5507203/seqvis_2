@@ -6,6 +6,7 @@ var Editor = function (  ) {
 
 
 	this.fullScreenMode = 0;
+	this.colorScheme = 0;
 	this.animationMode = 0;
 	this.canvas = document.createElement('canvas');
 	this.canvas.setAttribute('id', 'c');
@@ -32,7 +33,9 @@ var Editor = function (  ) {
 	this.signals = {
 
 
+		screenShot : new Signal(),
 		editorCleared: new Signal(),
+		changeColorScheme : new Signal(),
 
 		savingStarted: new Signal(),
 		savingFinished: new Signal(),
@@ -77,7 +80,7 @@ Editor.prototype = {
 
 		if (( this.selected[0] != undefined && this.selectionMode == 0 && this.selected[0].name == object.name )||( this.selected[0] != undefined && this.selectionMode == 1 && this.selected[0].uuid == object.uuid ) )return;
 
-		for( let sprite of this.selected ) sprite.material.color.set(Config.spriteColor);
+		for( let sprite of this.selected ) sprite.material.color.set(Config.colors.DATARED);
 		this.selected = [];
 
 		if(this.selectionMode == 0) this.crossSelect( object );
@@ -93,7 +96,7 @@ Editor.prototype = {
 
 		if ( this.selected[0] != undefined && this.selected[0].name === object.name ) return;
 
-		for( let sprite of this.selected ) sprite.material.color.set(Config.spriteColor);
+		for( let sprite of this.selected ) sprite.material.color.set(Config.colors.DATARED);
 		this.selected = [];
 		this.crossSelect( object );
 		if(this.selected.length != 0) this.signals.objectSelected.dispatch( this.selected  );
@@ -129,7 +132,6 @@ Editor.prototype = {
 		}
 		
 	},
-
 
 
 	singleSelect: function( object ) {
@@ -278,7 +280,9 @@ Editor.prototype = {
 		var geometry = new THREE.BufferGeometry();
 		var material = new THREE.LineBasicMaterial({ linewidth:5, color: 0xffffff, vertexColors: THREE.VertexColors });
 		var vertices;
-		var colors;
+
+		var coloredColors;
+		var blackColors;
 
 		// DRAW GRAPH SHAPES
 		if(dim == 1) {
@@ -289,10 +293,16 @@ Editor.prototype = {
 				1, 0, 0
 			] );
 			
-			colors = new Float32Array( [
+			coloredColors =  [
 				1, 0, 0,
 				0, 0, 1
-			] );	
+			];
+			
+			blackColors = [
+				0, 0, 0,
+				0, 0, 0
+			];
+			
 			
 		}
 		
@@ -310,7 +320,7 @@ Editor.prototype = {
 				1, 0, 0
 			] );
 			
-			colors = new Float32Array( [
+			coloredColors = [
 				0, 1, 0, 
 				1, 0, 0,
 				
@@ -319,8 +329,18 @@ Editor.prototype = {
 				
 				1, 0, 0,
 				0, 0, 1
-			] );
+			] ;
 	
+			blackColors = [
+				0, 0, 0,
+				0, 0, 0,
+				
+				0, 0, 0,
+				0, 0, 0,
+				
+				0, 0, 0,
+				0, 0, 0
+			];
 
 		}
 		
@@ -349,7 +369,7 @@ Editor.prototype = {
 
 			] );
 			
-			colors = new Float32Array( [
+			coloredColors = [
 				0, 1, 0, 
 				1, 0, 0,
 				
@@ -367,13 +387,35 @@ Editor.prototype = {
 				
 				0, 0, 1,
 				1, 1, 0
-			] );
+			];
 			
+			blackColors = [
+				0, 0, 0,
+				0, 0, 0,
+
+				0, 0, 0,
+				0, 0, 0,
+				
+				0, 0, 0,
+				0, 0, 0,
+				
+				0, 0, 0,
+				0, 0, 0,
+				
+				0, 0, 0,
+				0, 0, 0,
+				
+				0, 0, 0,
+				0, 0, 0
+			];			
 		}
 		
+		geometry.colored = coloredColors;
 		geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
-		geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
-	
+		
+		if(this.colorScheme == 0) geometry.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array(coloredColors), 3 ) );
+		else geometry.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array(blackColors), 3 ) );
+		
 		group.add( new THREE.LineSegments( geometry, material ));
 		return group;
 	},
@@ -409,11 +451,11 @@ Editor.prototype = {
 		labelsGroup.position.set(0,0,0);
 
 		group.add(axesGroup);
-		group.add(labelsGroup);
+		// group.add(labelsGroup);
 		
 		scope.drawAxesLabels(axesNames,function(axeslabelgroup){
 
-			labelsGroup.add(axeslabelgroup);
+			group.add(axeslabelgroup);
 			scope.signals.renderRequired.dispatch();
 			
 
@@ -423,7 +465,8 @@ Editor.prototype = {
 		var geometry = new THREE.BufferGeometry();
 		var material = new THREE.LineBasicMaterial({ linewidth:5, color: 0xffffff, vertexColors: THREE.VertexColors });
 		var vertices;
-		var colors;
+		var coloredColors;
+		var blackColors;
 
 		if(dim.length == 3  ){
 			vertices = new Float32Array( [
@@ -439,7 +482,7 @@ Editor.prototype = {
 
 			] );
 
-			colors = new Float32Array( [
+			coloredColors = [
 				1, 0, 0, 
 				1, 0, 0, 
 
@@ -448,10 +491,19 @@ Editor.prototype = {
 
 				0, 1, 0,					
 				0, 1, 0
-			] );
+			];
 	
 
+			blackColors = [
+				0, 0, 0, 
+				0, 0, 0, 
 
+				0, 0, 0,
+				0, 0, 0,
+
+				0, 0, 0,					
+				0, 0, 0
+			];
 		}
 
 		else if( dim.length == 4 ){
@@ -472,7 +524,7 @@ Editor.prototype = {
 
 			] );
 
-			colors = new Float32Array( [
+			coloredColors = [
 				1, 0, 0, 
 				1, 0, 0, 
 
@@ -484,18 +536,33 @@ Editor.prototype = {
 
 				1, 1, 0,					
 				1, 1, 0
-			] );
+			];
 
+			blackColors = [
+				0, 0, 0, 
+				0, 0, 0, 
 
+				0, 0, 0,
+				0, 0, 0,
+
+				0, 0, 0,
+				0, 0, 0,
+
+				0, 0, 0,					
+				0, 0, 0
+			];
 		}
-	
+			
+		// geometry.alternativeColor = 
 		// this.calcuateLabel(new THREE.Vector3(0, 0, 0),new THREE.Vector3(0.5, ROOTSIX/9, ROOTTHREE/6));
 		// this.calcuateLabel(new THREE.Vector3(1, 0, 0),new THREE.Vector3(0.5, ROOTSIX/9, ROOTTHREE/6));
 		// this.calcuateLabel(new THREE.Vector3(0.5, ROOTSIX/3, ROOTTHREE/6),new THREE.Vector3(0.5, ROOTSIX/9, ROOTTHREE/6));
 		// this.calcuateLabel(new THREE.Vector3(0.5, 0, ROOTTHREE/2),new THREE.Vector3(0.5, ROOTSIX/9, ROOTTHREE/6));
-
+		geometry.colored = coloredColors;
 		geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
-		geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
+		
+		if(this.colorScheme == 0) geometry.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array(coloredColors), 3 ) );
+		else geometry.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array(blackColors), 3 ) );
 	
 		axesGroup.add( new THREE.LineSegments( geometry, material ));
 		return group;
@@ -535,7 +602,7 @@ Editor.prototype = {
 		var scope = this;
 		var group = new THREE.Group();
 		group.position.set(0,0,0);
-		var colors;
+		var coloredColors;
 		var len = axesNames.length;
 		var coordinates;
 		if( len == 2 ) {
@@ -543,7 +610,7 @@ Editor.prototype = {
 				new THREE.Vector3(0,0,0),
 				new THREE.Vector3(1,0,0)
 			];
-			colors = [Config.spriteColor, 0x0000ff];
+			coloredColors = [0xff0000, 0x0000ff];
 		
 		}
 		else if(len == 3) {
@@ -552,7 +619,7 @@ Editor.prototype = {
 				new THREE.Vector3( -0.0866, -0.05, 0 ),
 				new THREE.Vector3( 1.0866, -0.05, 0 )
 			];
-			colors  = [0x00ff00, Config.spriteColor, 0x0000ff];
+			coloredColors  = [0x00ff00, 0xff0000, 0x0000ff];
 		}
 		else if (len == 4) {
 			coordinates = [	
@@ -561,7 +628,7 @@ Editor.prototype = {
 				new THREE.Vector3 ( 1.0783, -0.0426, -0.0452),
 				new THREE.Vector3 ( 0.5, -0.0426, 0.9565)
 			];
-			colors  = [0x00ff00, Config.spriteColor, 0x0000ff, 0xffff00];
+			coloredColors  = [0x00ff00, 0xff0000, 0x0000ff, 0xffff00];
 		}
 		var counter = 0;
 
@@ -575,7 +642,11 @@ Editor.prototype = {
 				function ( texture ) {
 				
 					// if(len!=3) return;
-					var sprite = scope.drawSprite(coordinate, 0.2, texture, color, 'label');
+					if( scope.colorScheme == '0' ) var sprite = scope.drawSprite(coordinate, 0.2, texture, new THREE.Color(color), 'label');
+					
+					else var sprite = scope.drawSprite(coordinate, 0.2, texture, Config.colors.BLACK, 'label');
+					
+					sprite.material.colored = new THREE.Color(color);
 					group.add( sprite);
 					counter += 1;
 					if(counter == len) callback(group);
@@ -584,12 +655,54 @@ Editor.prototype = {
 
 		for ( var i = 0;i<len;i+=1){
 
-			drawAxis(axesNames[i],coordinates[i],colors[i]);
+			drawAxis(axesNames[i],coordinates[i],coloredColors[i]);
 
 		}
 		return group;
 	},
+	
+	changeBufferGeometryColorScheme : function ( parent, type ){
+	
+		
+		for(let child of parent.children){
+			var colorAttribute = child.geometry.attributes.color;
+			var colored = child.geometry.colored;
+			var colorArray = colorAttribute.array;
+			if( type == '0' ){
+				
+				
+				for( var index = 0; index < colorArray.length; index += 1 ) {
+					
+					colorArray[index] = colored[index]
+				}
+			}
+			else{
+				
+				for( var index = 0; index < colorArray.length; index += 1 ) {
+					
+					colorArray[index] = 0
+				}
+			}
+			colorAttribute.needsUpdate = true;
+			
+			
+		}
 
+	},
+	
+	changeSpriteColorScheme: function ( parent, type ){
+		console.log(parent);
+
+	
+		for(let child of parent.children){
+			
+			if(type == '1') child.material.color = Config.colors.BLACK;
+			else child.material.color = child.material.colored;
+			child.material.needsUpdate = true;
+		}
+		
+
+	},
 	drawData: function( objects, data ){
 
 		var group = new THREE.Group();
@@ -598,7 +711,7 @@ Editor.prototype = {
 
 		for (let [name,pointInfo] of Object.entries(data)){
 		
-			var sprite = this.drawSprite(pointInfo.position, 0.01, Config.dataTexture, Config.spriteColor, name,pointInfo.frequence);
+			var sprite = this.drawSprite(pointInfo.position, 0.02, Config.dataTexture, Config.colors.DATARED, name,pointInfo.frequence);
 			group.add( sprite );
 			objects.push(sprite);
 		}
@@ -648,8 +761,8 @@ Editor.prototype = {
 		// ADD LIGHT
 		var light = new THREE.AmbientLight( 0x404040 ); // soft white light
 		scene.add( light );
-	
-		scene.background = new THREE.Color(0x030303);
+		if(scope.colorScheme == 0)	scene.background = Config.colors.SCENEDARK;
+		else scene.background = Config.colors.SCENELIGHT;
 		scope.scenes.push( scene );
 
 		camera = scene.userData.camera;
