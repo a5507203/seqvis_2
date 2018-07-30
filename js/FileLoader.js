@@ -6,10 +6,11 @@ var FileLoader = function ( editor ) {
     var scope = this;
     var signals = this.signals = editor.signals;
     this.editor = editor;
-    var reader = this.reader = new FileReader();
-
+ 
+    this.count = 0;
 
     signals.fileLoaded.add(function( file, type ){
+        console.log('file loaded ');
         if(type == "") scope.loadFile( file ); 
         else scope.loadDataString( file,type ); 
     });
@@ -22,29 +23,38 @@ FileLoader.prototype = {
     // load a zip folder
     loadFile: function( file ){
         var scope = this;
-        scope.reader.addEventListener( 'load', function ( event ) {	
+        scope.editor.clear();
+        this.count += 1;
+
+        var reader = new FileReader();
+        // if (this.count > 1) return;
+        reader.addEventListener( 'load', function ( event ) {	
             var contents = event.target.result;
-            console.log(JSON.stringify(contents));
+            
+            // console.log(JSON.stringify(contents));
             if(file.name.match(/\.fasta/)){
                 scope.dataPreprocessFasta(contents);
+                console.log('fasta');
                 scope.signals.dataPrepared.dispatch();
             }
             else if(file.name.match(/\.nex/)){
+                   console.log('nex');
                 scope.dataPreprocessNex(contents);
                 scope.signals.dataPrepared.dispatch();
             }
             else if(file.name.match(/\.phy/)){
+                   console.log('phy');
                 scope.dataPreprocessPhy(contents);
                 scope.signals.dataPrepared.dispatch();
             }
             
         }, false );
         
-        scope.reader.readAsBinaryString( file );
+        reader.readAsBinaryString( file );
     },
 
     loadDataString:function(contents,type){
-        console.log(type);
+ 
         
         if(type=='fasta'){
             this.dataPreprocessFasta(contents);
@@ -75,7 +85,7 @@ FileLoader.prototype = {
             this.editor.inputData[seqName] = this.getSeqInfo(seq);
         
         }
-        console.log(this.editor.inputData);
+        // console.log(this.editor.inputData);
 
         
     },

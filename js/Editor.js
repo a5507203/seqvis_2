@@ -27,7 +27,6 @@ var Editor = function (  ) {
 	this.addNewEdgeMode = 0;
 	this.inputData  = {};
 	this.selectionMode = 0;
-	this.animationDict= {};
 
 	var Signal = signals.Signal;
 
@@ -139,7 +138,20 @@ Editor.prototype = {
 		this.selected.push(object);
 		object.material.color.set(0x00ff00);
 	},
+	
+	resetViewport:function(){
 
+		console.log('afaffasffafa');
+		while (this.scenes.length > 0){
+					this.deleteScene(this.scenes[0].userData.element.parentNode,this.scenes[0].uuid);
+		}
+
+		this.selected = [];
+		this.fullScreenScene = null;
+		this.fullScreenMode = 0;
+		this.setSceneSize(Config.sceneSize.two);
+		this.signals.renderRequired.dispatch();
+	},
 
 	deleteScene:function(listItem,uuid){
 	
@@ -163,7 +175,7 @@ Editor.prototype = {
 		for ( var currScene of this.scenes ) {
 
 			if (currScene.uuid != scene.uuid ) {
-				// console.log(scene)
+			
 				currScene.userData.element.parentElement.style.display = 'none';
 			}
 			this.setSceneSize(Config.sceneSize.fullScreen);
@@ -592,7 +604,7 @@ Editor.prototype = {
 
 	startAnimations: function(){
 		for(let scene of this.scenes){
-			// console.log(scene)
+	
 			scene.userData.animation.start();
 		}
 
@@ -750,6 +762,7 @@ Editor.prototype = {
 	
 		scene.userData.element = element.querySelector( ".scene" );
 		scope.viewport.appendChild( element );
+		console.log('append',scope.viewport.childNodes.length)
 		var dom = scene.userData.element;
 		
 		var camera = new THREE.PerspectiveCamera( 50, 1);
@@ -802,7 +815,7 @@ Editor.prototype = {
 						
 					}
 					// body...
-				})
+				});
 				
 			}
 			scope.signals.renderRequired.dispatch();
@@ -935,7 +948,23 @@ Editor.prototype = {
 		this.styleSheet.deleteRule(0);
 		this.styleSheet.insertRule(rules, 0);
 		this.signals.sceneResize.dispatch();
-	}
+	},
+
+	clear :function(){
+
+		this.inputData = {};
+	
+		this.lockMode = 0;
+		this.animationMode = 0;
+
+		this.addNewEdgeMode = 0;
+		this.selectionMode = 0;
+
+		this.resetViewport();
+		this.signals.editorCleared.dispatch();
+
+
+	},
 
 };
 

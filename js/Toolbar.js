@@ -38,6 +38,11 @@ var Toolbar = function ( editor ) {
 	} );
 	buttons.add( four );
 
+	signals.editorCleared.add(function(){
+		two.dom.classList.add( 'selected' );
+		three.dom.classList.remove( 'selected' );
+		four.dom.classList.remove( 'selected' );
+	});
 
 	function updateSceneSizeUI ( type ) {
 
@@ -97,7 +102,7 @@ var Toolbar = function ( editor ) {
 
 
 
-	var playButton = new UI.Button( 'play' ).setMarginLeft('20px');
+	var playButton = new UI.Button( 'Play' ).setMarginLeft('20px');
 
 	playButton.onClick( function () {
 		if (playButton.dom.classList.contains( 'selected' )) {
@@ -115,14 +120,7 @@ var Toolbar = function ( editor ) {
 	
 	
 	
-	var screenShotButton = new UI.Button( 'Scrn' );
-	
-	screenShotButton.onClick( function () {
-		
-		signals.screenShot.dispatch( );
-	} );
-	
-	buttons.add( screenShotButton );
+
 	
 	var lockButton = new UI.Button( 'Lock' );
 	
@@ -140,6 +138,15 @@ var Toolbar = function ( editor ) {
 	} );
 	
 	buttons.add( lockButton );
+
+		var screenShotButton = new UI.Button( 'Scrn' );
+	
+	screenShotButton.onClick( function () {
+		
+		signals.screenShot.dispatch( );
+	} );
+	
+	buttons.add( screenShotButton );
 
 	// var singleSelection = new UI.Button( 'Single Selection' );
 	// singleSelection.onClick( function () {

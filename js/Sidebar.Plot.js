@@ -99,6 +99,7 @@ Sidebar.Plot = function ( editor ) {
 		var thirdPosCoordinates = getCoordinates(editor.inputData,'thirdPositionFreq', ['A','C','G','T']);
 		signals.addScene.dispatch(viewType.thirdPositionFreq,thirdPosCoordinates,['A','C','G','T'],['A','C','G','T']);
 		
+		
 	});
 
 	var data = localStorage.getItem('file');

@@ -37,7 +37,10 @@ Sidebar.Settings = function ( editor ) {
 	
 	container.add(pointSizeRow);
 	
-	console.log(pointSizeSlider)
+	signals.editorCleared.add(function(){
+		theme.setValue('0');
+		editor.colorScheme = 0;
+	});
 	
 	pointSizeSlider.dom.oninput = function() {
 		

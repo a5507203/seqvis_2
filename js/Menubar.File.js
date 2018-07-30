@@ -33,10 +33,13 @@ Menubar.File = function ( editor ) {
 	fileInput.addEventListener( 'change', function ( event ) {
 
 		signals.fileLoaded.dispatch(fileInput.files[ 0 ],'');
+		// console.log
+		fileInput.value = null;
 		form.reset();
+		console.log(fileInput.files);
 
 	} );
-
+	form.appendChild(fileInput);
 	var upload = new UI.Row();
 	upload.setClass( 'option' );
 	upload.setTextContent( 'Upload' );
