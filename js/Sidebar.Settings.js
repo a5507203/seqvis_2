@@ -23,10 +23,27 @@ Sidebar.Settings = function ( editor ) {
 
 	} );
 
-	themeRow.add( new UI.Text( 'Theme' ).setWidth( '90px' ) );
+	themeRow.add( new UI.Text( 'Theme' ).setWidth( '100px' ) );
 	themeRow.add( theme );
 
 	container.add( themeRow );
+	
+	
+	var pointSizeRow = new UI.Row();
+	var pointSizeSlider = new UI.Slider(1,10,10);
+
+	pointSizeRow.add(new UI.Text( 'Set point size' ).setWidth( '100px' ) );
+	pointSizeRow.add( pointSizeSlider );
+	
+	container.add(pointSizeRow);
+	
+	console.log(pointSizeSlider)
+	
+	pointSizeSlider.dom.oninput = function() {
+		
+		signals.pointSizeChanged.dispatch(this.value/500);
+
+	} 
 
 	return container;
 

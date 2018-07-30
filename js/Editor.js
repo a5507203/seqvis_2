@@ -6,6 +6,7 @@ var Editor = function (  ) {
 
 
 	this.fullScreenMode = 0;
+	this.lockMode = 0;
 	this.colorScheme = 0;
 	this.animationMode = 0;
 	this.canvas = document.createElement('canvas');
@@ -40,7 +41,6 @@ var Editor = function (  ) {
 		savingStarted: new Signal(),
 		savingFinished: new Signal(),
 		loadDataUrl: new Signal(),
-	
 
 		refreshAvaiableGames: new Signal(),
 		windowResize: new Signal(),
@@ -446,6 +446,7 @@ Editor.prototype = {
 
 		var axesGroup = new THREE.Group();
 		axesGroup.position.set(0,0,0);
+		axesGroup.visible = false;
 		
 		var labelsGroup = new THREE.Group();
 		labelsGroup.position.set(0,0,0);
@@ -765,7 +766,6 @@ Editor.prototype = {
 		else scene.background = Config.colors.SCENELIGHT;
 		scope.scenes.push( scene );
 
-		camera = scene.userData.camera;
 		
 
 		camera.aspect = dom.offsetWidth / dom.offsetHeight;
@@ -779,9 +779,7 @@ Editor.prototype = {
 		orbitControls.autoRotate = false;
 		// orbitControls.enableZoom = false;
 		scene.userData.orbitControls = orbitControls;
-		orbitControls.addEventListener('change', function(){
-			scope.signals.renderRequired.dispatch();
-		});
+
 		//ADD OBJECT SELECTION CONTROLS
 		scope.objectPicking(scene);
 		//ADD AXIS AND DATA
@@ -789,6 +787,26 @@ Editor.prototype = {
 		scene.add( container );
 		scene.userData.animation = scope.createAnimation(container);
 		scope.signals.renderRequired.dispatch();
+		orbitControls.addEventListener('change', function(){
+			
+			if (scope.lockMode == 1 ){
+				scope.scenes.forEach(function (otherScene) {
+					if(scene != otherScene) {
+						var otherCamera  = otherScene.userData.camera;
+						var camera = scene.userData.camera;
+						otherCamera.position.copy(camera.position);
+						otherCamera.scale.copy(camera.scale);
+						otherCamera.rotation.copy(camera.rotation);
+						// otherCamera.rotation = scene.userData.camera.rotation.clone();
+
+						
+					}
+					// body...
+				})
+				
+			}
+			scope.signals.renderRequired.dispatch();
+		});
 	},
 
 	objectPicking:function(scene){

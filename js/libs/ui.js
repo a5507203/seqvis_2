@@ -632,6 +632,35 @@ UI.Color.prototype.setHexValue = function ( hex ) {
 };
 
 
+ //<input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+// Range Slider
+UI.Slider = function (min, max, value) {
+	
+	UI.Element.call( this );
+	
+	var scope = this; 
+	
+	var dom = document.createElement( 'input' );
+	this.dom = dom;
+	dom.type = 'range';
+	dom.className = 'slider';
+	dom.min = min;
+	dom.max = max;
+	dom.value = value;
+	
+	this.value = value;
+	
+	
+	return this;
+	// body...
+};
+
+UI.Slider.prototype = Object.create( UI.Element.prototype );
+UI.Slider.prototype.constructor = UI.Slider;
+
+
+
+
 // Number
 
 UI.Number = function ( number ) {

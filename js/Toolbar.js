@@ -39,7 +39,6 @@ var Toolbar = function ( editor ) {
 	buttons.add( four );
 
 
-
 	function updateSceneSizeUI ( type ) {
 
 		
@@ -116,13 +115,31 @@ var Toolbar = function ( editor ) {
 	
 	
 	
-	var screenShotButton = new UI.Button( 'Scrn' ).setMarginLeft('20px');
+	var screenShotButton = new UI.Button( 'Scrn' );
 	
 	screenShotButton.onClick( function () {
-
+		
 		signals.screenShot.dispatch( );
 	} );
+	
 	buttons.add( screenShotButton );
+	
+	var lockButton = new UI.Button( 'Lock' );
+	
+	lockButton.onClick( function () {
+		if(editor.lockMode == 0) {
+			editor.lockMode = 1;
+			lockButton.dom.classList.add( 'selected' );
+			
+		}
+		else {
+			editor.lockMode = 0;
+			lockButton.dom.classList.remove( 'selected' );
+			
+		}
+	} );
+	
+	buttons.add( lockButton );
 
 	// var singleSelection = new UI.Button( 'Single Selection' );
 	// singleSelection.onClick( function () {

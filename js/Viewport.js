@@ -173,14 +173,19 @@ var Viewport = function ( editor ) {
 	function screenShot(){
 		
 		var w = window.open('', '');
-		w.document.title = "Screenshot";
-		//w.document.body.style.backgroundColor = "red";
-		// var t = editor.viewport.getContext('2d');
-		// var img = new Image();
-		// // Without 'preserveDrawingBuffer' set to true, we must render now
-		// renderer.render(scenes[0], scenes[0].userData.camera);
-		// img.src = renderer.domElement.toDataURL();
-		w.document.body.appendChild(editor.viewport.toDataURL());  
+			renderAll()
+				var imgData = renderer.domElement.toDataURL();     
+				// let pngUrl = c.toDataURL();
+				// // console.log(pngUrl);
+				
+				
+				var img = new Image();
+				// Without 'preserveDrawingBuffer' set to true, we must render now
+				
+				img.src = imgData;
+				w.document.body.appendChild(img);  
+ 
+
 	}
 
 	

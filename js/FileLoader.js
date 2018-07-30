@@ -1,9 +1,6 @@
 var FileLoader = function ( editor ) {
     
-    this.FLOWFILENAME  = 'flows.csv';
-    this.EDGEFILENAME = 'networks.csv';
-    this.NODEFILENAME = 'nodes.csv'; 
-    this.TRIPFILENAME = 'trips.csv';
+
     this.ROOTTHREE = 1.7321;
     this.ROOTSIX = 2.4495;
     var scope = this;
@@ -273,5 +270,3 @@ FileLoader.prototype = {
 
 
 };
-
-

@@ -7,17 +7,6 @@ Sidebar.Plot = function ( editor ) {
 	// var inputData = null;
 	container.add( new UI.Break(),new UI.Break());
 
-	var pointSizeRow = new UI.Row();
-	var pointSize = new UI.Integer().setStep(1).setRange(1,10).setValue(10).onChange(function(){
-		signals.pointSizeChanged.dispatch(pointSize.getValue()/500);
-
-	});
-	pointSizeRow.add( new UI.Text( 'Point size' ).setWidth( '120px' ) );
-	pointSizeRow.add( pointSize );
-	container.add( pointSizeRow );
-	container.add( new UI.HorizontalRule() );
-	container.add( new UI.Break(),new UI.Break());
-
 	var viewType = {
 		'allPositionFreq':'All position',
 		'firstPositionFreq':'1st codon position',

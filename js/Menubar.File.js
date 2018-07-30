@@ -29,7 +29,9 @@ Menubar.File = function ( editor ) {
 	document.body.appendChild( form );
 	var fileInput = document.createElement( 'input' );
 	fileInput.type = 'file';
+	fileInput.accept=".nex,.phy,.fasta";
 	fileInput.addEventListener( 'change', function ( event ) {
+
 		signals.fileLoaded.dispatch(fileInput.files[ 0 ],'');
 		form.reset();
 

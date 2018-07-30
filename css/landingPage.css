@@ -1,6 +1,7 @@
 
 html { 
-  background: url(../image/dna.jpg) no-repeat center center fixed; 
+  background: url(../image/dna1.png) no-repeat center center fixed; 
+  background-color: #c8d3dc;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
@@ -8,21 +9,31 @@ html {
 }
 
 .container{
-  width: 100%;
-  margin-top: 20%;
+  /*width: 100%;*/
+  /*margin-top: 20%;*/
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  width:50%;
+  height: 50%;
   text-align: center;
   font-family: "Playfair Display", Arial, serif;
-  color: #fff;
+  color: #111;
   
 
 }
 h1{
 
   font-size: 100px;
+  margin-top: 0px;
+  margin-bottom: 30px;
 }
 h2{
 
   font-size: 50px;
+}
+img{
+    margin-top: 0;
 }
 
 .file{
@@ -35,7 +46,7 @@ h2{
 
 
   color:#fff;
-  background-color: rgba(48, 167, 5);
+  background-color: #30a705;
   font-size:20px;
   height: 50px;
   width: 200px;
@@ -45,7 +56,7 @@ h2{
 
 }
 .file>.demo{
-  background: rgba(255, 255, 255, 0.8);
+  background: #aaaaaa;
   font-size:20px;
   height: 50px;
   width: 100px;
