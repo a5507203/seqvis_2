@@ -6,7 +6,7 @@ var Editor = function (  ) {
 
 
 	this.fullScreenMode = 0;
-	this.lockMode = 0;
+	this.lockMode = 1;
 	this.colorScheme = 0;
 	this.animationMode = 0;
 	this.canvas = document.createElement('canvas');
@@ -214,7 +214,7 @@ Editor.prototype = {
 		toggleAxesButton.style['background-image'] = 'url(./image/axes.png)';
 		footRow.appendChild(toggleAxesButton).onclick = function() {
 			scope.signals.hideChild.dispatch(scene, 'axes');
-		};;
+		};
 
 		var toggleWireframeButton = document.createElement('button');
 		toggleWireframeButton.setAttribute('class','optionButton');
@@ -954,7 +954,7 @@ Editor.prototype = {
 
 		this.inputData = {};
 	
-		this.lockMode = 0;
+	
 		this.animationMode = 0;
 
 		this.addNewEdgeMode = 0;

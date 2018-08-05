@@ -123,7 +123,8 @@ var Toolbar = function ( editor ) {
 
 	
 	var lockButton = new UI.Button( 'Lock' );
-	
+	lockButton.dom.classList.add( 'selected' );
+
 	lockButton.onClick( function () {
 		if(editor.lockMode == 0) {
 			editor.lockMode = 1;
@@ -168,7 +169,10 @@ var Toolbar = function ( editor ) {
 
 	// 	}
 	// });
-
+	signals.editorCleared.add(function(){
+		editor.lockMode = 1;
+		lockButton.dom.classList.add( 'selected' );
+	});
 	signals.fullScreenMode.add( function(bool, scene){
 
 		if( bool == true ) {

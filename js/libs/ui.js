@@ -648,17 +648,20 @@ UI.Slider = function (min, max, value) {
 	dom.max = max;
 	dom.value = value;
 	
-	this.value = value;
-	
-	
 	return this;
-	// body...
+
 };
 
 UI.Slider.prototype = Object.create( UI.Element.prototype );
 UI.Slider.prototype.constructor = UI.Slider;
 
+UI.Slider.prototype.setValue = function ( value ) {
 
+	this.dom.value = value;
+
+	return this;
+
+};
 
 
 // Number

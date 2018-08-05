@@ -46,7 +46,7 @@ Sidebar.Settings = function ( editor ) {
 		
 		signals.pointSizeChanged.dispatch(this.value/500);
 
-	} 
+	};
 
 	return container;
 

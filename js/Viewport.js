@@ -173,17 +173,13 @@ var Viewport = function ( editor ) {
 	function screenShot(){
 		
 		var w = window.open('', '');
-			renderAll()
-				var imgData = renderer.domElement.toDataURL();     
-				// let pngUrl = c.toDataURL();
-				// // console.log(pngUrl);
-				
-				
-				var img = new Image();
-				// Without 'preserveDrawingBuffer' set to true, we must render now
-				
-				img.src = imgData;
-				w.document.body.appendChild(img);  
+			renderAll();
+			var imgData = renderer.domElement.toDataURL();     
+		
+			var img = new Image();
+			
+			img.src = imgData;
+			w.document.body.appendChild(img);  
  
 
 	}

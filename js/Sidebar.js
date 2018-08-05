@@ -7,12 +7,11 @@ var Sidebar = function ( editor ) {
 
 	var viewTab = new UI.Text( 'View' ).onClick( onClick );
 	var plotTab = new UI.Text( 'Plot' ).onClick( onClick );
-	var settingsTab  = new UI.Text( 'Settings' ).onClick( onClick );
-	
+
 	var tabs = new UI.Div();
 	tabs.setId( 'tabs' );
-	tabs.add( viewTab,plotTab,settingsTab );
-	//	, clusterTab, editTab
+	tabs.add( viewTab,plotTab );
+	
 	container.add( tabs );
 
 	var view = new UI.Span().add(
@@ -27,14 +26,6 @@ var Sidebar = function ( editor ) {
 	container.add( plot );
 
 
-	var settings = new UI.Span().add(
-		new Sidebar.Settings( editor )
-
-	);
-	
-	container.add( settings );
-
-
 	function onClick( event ) {
 		select( event.target.textContent );
 	}
@@ -43,11 +34,11 @@ var Sidebar = function ( editor ) {
 
 		viewTab.setClass( '' );
 		plotTab.setClass( '' );
-		settingsTab.setClass( '' );
+	
 
 		view.setDisplay( 'none' );
 		plot.setDisplay( 'none' );
-		settings.setDisplay( 'none' );
+	
 
 		switch ( section ) {
 			case 'View':
@@ -58,10 +49,6 @@ var Sidebar = function ( editor ) {
 			case 'Plot':
 				plotTab.setClass( 'selected' );
 				plot.setDisplay( '' );
-				break;
-			case 'Settings':
-				settingsTab.setClass( 'selected' );
-				settings.setDisplay( '' );
 				break;
 		}
 
