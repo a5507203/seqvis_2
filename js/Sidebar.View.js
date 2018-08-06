@@ -63,6 +63,18 @@ Sidebar.View = function ( editor ) {
 
 	searchRow.add(searchButton);
 
+		
+	document.addEventListener( 'keydown', function ( event ) {
+
+		switch ( event.keyCode ) {
+			case 13:
+			searchButton.dom.click();
+			break;
+
+
+		}
+	});
+
 	var parameters = new UI.Span();
 	container.add( parameters );
 
@@ -115,7 +127,7 @@ Sidebar.View = function ( editor ) {
 			var freqRow = new UI.Row();
 			// console.log(editor.inputData.single[name])
 			var freq = '';
-			console.log(object.freq,object.name);
+			// console.log(object.freq,object.name);
 			for ( let [key,value] of Object.entries(object.freq)){
 				freq += 'f'+key+': '+Math.round10(value,-2)+' ';
 			}

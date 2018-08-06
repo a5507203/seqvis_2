@@ -60,7 +60,8 @@
             }
             localStorage.setItem('type', type);
             localStorage.setItem('file', reader.result);
-            location.href = "seqvis.html";    
+            // location.href = "seqvis.html";    
+            location.href="/seqvis.html";
         };         
         reader.readAsText(inputFile);
     }

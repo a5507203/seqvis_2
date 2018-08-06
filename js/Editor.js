@@ -70,6 +70,7 @@ var Editor = function (  ) {
 	this.scenes = [];
 	this.selected = [];
 	this.fullScreenScene = null;
+	this.searchPatten = '';
 
 };
 
@@ -92,14 +93,16 @@ Editor.prototype = {
 	selectByName : function( name ) {
 		
 		var object = {name: name};
-
-		if ( this.selected[0] != undefined && this.selected[0].name === object.name ) return;
+		if ( this.searchPatten == name || this.name == '') return;
+		// if ( this.selected[0] != undefined && this.selected[0].name === object.name ) return;
 
 		for( let sprite of this.selected ) sprite.material.color.set(Config.colors.DATARED);
 		this.selected = [];
 		this.crossSelect( object );
+		this.searchPatten = name;
 		if(this.selected.length != 0) this.signals.objectSelected.dispatch( this.selected  );
 		this.signals.renderRequired.dispatch();
+	
 
 
 	},
@@ -141,7 +144,7 @@ Editor.prototype = {
 	
 	resetViewport:function(){
 
-		console.log('afaffasffafa');
+	
 		while (this.scenes.length > 0){
 					this.deleteScene(this.scenes[0].userData.element.parentNode,this.scenes[0].uuid);
 		}
@@ -686,14 +689,14 @@ Editor.prototype = {
 				
 				for( var index = 0; index < colorArray.length; index += 1 ) {
 					
-					colorArray[index] = colored[index]
+					colorArray[index] = colored[index];
 				}
 			}
 			else{
 				
 				for( var index = 0; index < colorArray.length; index += 1 ) {
 					
-					colorArray[index] = 0
+					colorArray[index] = 0;
 				}
 			}
 			colorAttribute.needsUpdate = true;
@@ -953,7 +956,7 @@ Editor.prototype = {
 	clear :function(){
 
 		this.inputData = {};
-	
+		this.searchPatten = '';
 	
 		this.animationMode = 0;
 
