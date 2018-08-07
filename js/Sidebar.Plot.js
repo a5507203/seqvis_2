@@ -102,10 +102,11 @@ Sidebar.Plot = function ( editor ) {
 		
 	});
 
-	var data = localStorage.getItem('file');
-	var type = localStorage.getItem('type');
-	if(data) signals.fileLoaded.dispatch(data,type);
-	localStorage.clear();
+	
+	if(fileData != '') signals.fileLoaded.dispatch(fileData,fileType);
+	fileData = '';
+	fileType = '';
+	
 	return container;
 
 };
