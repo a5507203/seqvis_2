@@ -41,7 +41,7 @@ function oneDimCoordinates(seqInfo, position, groups, axesName)  {
             x += point[axes];
         }
         data[name] = {};
-        data[name].position = new THREE.Vector3(1-x,0,0);
+        data[name].position = new THREE.Vector3((1-x)*Config.scalar,0,0);
 
         data[name].frequence = {};
         data[name].frequence[firstAxes] = x;
@@ -85,7 +85,7 @@ function twoDimCoordinates(seqInfo, position, groups, axesName)  {
         
 
         data[name] = {};
-        data[name].position = new THREE.Vector3(x,y,0);
+        data[name].position = new THREE.Vector3(x*Config.scalar,y*Config.scalar,0);
 
         data[name].frequence = {};
         data[name].frequence[firstAxes] = t;
@@ -111,7 +111,7 @@ function threeDimCoordinates(seqInfo,position)  {
         var x = (point.G + 1 - point.C)/2;
         var y = ROOTSIX*point.A/3;
         var z = ROOTTHREE*point.T/2 + ROOTTHREE*point.A/6;
-        data[name] = {frequence:point, position: new THREE.Vector3(x,y,z)};
+        data[name] = {frequence:point, position: new THREE.Vector3(x*Config.scalar,y*Config.scalar,z*Config.scalar)};
         
     }
     

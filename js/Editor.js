@@ -26,7 +26,6 @@ var Editor = function (  ) {
 
 	this.addNewEdgeMode = 0;
 	this.inputData  = {};
-	this.selectionMode = 0;
 
 	var Signal = signals.Signal;
 
@@ -68,7 +67,8 @@ var Editor = function (  ) {
 
 
 	this.scenes = [];
-	this.selected = [];
+	this.selected = new Set();
+	
 	this.fullScreenScene = null;
 	this.searchPatten = '';
 
@@ -76,30 +76,42 @@ var Editor = function (  ) {
 
 Editor.prototype = {
 
-	select: function ( object ) {
+	select: function ( intersect ) {
 
-		if (( this.selected[0] != undefined && this.selectionMode == 0 && this.selected[0].name == object.name )||( this.selected[0] != undefined && this.selectionMode == 1 && this.selected[0].uuid == object.uuid ) )return;
+		//remove select
+		this.changeDataColors(Config.colors.DATARED);
+		this.selected = new Set();
+		this.searchPatten = '';
 
-		for( let sprite of this.selected ) sprite.material.color.set(Config.colors.DATARED);
-		this.selected = [];
+		this.selected.add(intersect.index);
+		
+		this.changeDataColors( Config.colors.SELECTED );
 
-		if(this.selectionMode == 0) this.crossSelect( object );
-		else this.singleSelect( object );
-
-		this.signals.objectSelected.dispatch( [object] );
+		this.signals.objectSelected.dispatch( this.selected );
 		this.signals.renderRequired.dispatch();
 	},
 
 	selectByName : function( name ) {
-		
-		var object = {name: name};
-		if ( this.searchPatten == name || this.name == '') return;
-		// if ( this.selected[0] != undefined && this.selected[0].name === object.name ) return;
 
-		for( let sprite of this.selected ) sprite.material.color.set(Config.colors.DATARED);
-		this.selected = [];
-		this.crossSelect( object );
+		name = name.toUpperCase();
+		if ( this.searchPatten == name || this.name == '') return;
+
+		//remove select
+		this.changeDataColors(Config.colors.DATARED);
+		this.selected = new Set();
+
+		var keyList = Object.keys(this.inputData);
+
+		for ( var i = 0 ; i < keyList.length; i+= 1 ) {
+
+			if ( keyList[i].toUpperCase().includes(name)){
+				this.selected.add(i);
+			}
+		}
+		
 		this.searchPatten = name;
+
+		this.changeDataColors( Config.colors.SELECTED );
 		if(this.selected.length != 0) this.signals.objectSelected.dispatch( this.selected  );
 		this.signals.renderRequired.dispatch();
 	
@@ -108,39 +120,37 @@ Editor.prototype = {
 	},
 	changePointSize: function( size ) {
 		for( let scene of this.scenes) {
-			for ( var i = 0 ; i <scene.children[1].children[0].children[2].children.length; i+=1){
-				sprite = scene.children[1].children[0].children[2].children[i];
-				scene.children[1].children[0].children[2].children[i].scale.set(size,size,size);
-				sprite.updateMatrixWorld( true );
-			}
+			
+			var pointsMaterial = scene.children[1].children[0].children[2].material;
+			pointsMaterial.size = size;
+			pointsMaterial.needsUpdate = true;
+	
 		}
 		this.signals.renderRequired.dispatch();
 
 	},
 
-	crossSelect: function ( object ) {
-		var scope  = this;
+	changeDataColors: function( color ) {
+
+		var indices = Array.from(this.selected);
+
 		for ( let scene of this.scenes ) {
-			for ( var i = 0 ; i <scene.children[1].children[0].children[2].children.length; i+=1){
-				
-				sprite = scene.children[1].children[0].children[2].children[i];
-				
-				if (sprite.name.toUpperCase().includes(object.name.toUpperCase())){
-					scope.selected.push(sprite);
-					sprite.material.color.set(0x00ff00);
-				}
+
+			var colorAttribute = scene.children[1].children[0].children[2].geometry.attributes.color;
+			var colorArray = colorAttribute.array;
+			for (let index of indices) {
+
+				colorArray[3*index] = color.r;
+				colorArray[3*index+1] = color.g;
+				colorArray[3*index+2] = color.b;
+
+			
 			}
-
+			colorAttribute.needsUpdate = true;
 		}
-		
 	},
 
 
-	singleSelect: function( object ) {
-
-		this.selected.push(object);
-		object.material.color.set(0x00ff00);
-	},
 	
 	resetViewport:function(){
 
@@ -149,7 +159,7 @@ Editor.prototype = {
 					this.deleteScene(this.scenes[0].userData.element.parentNode,this.scenes[0].uuid);
 		}
 
-		this.selected = [];
+		this.selected = new Set();
 		this.fullScreenScene = null;
 		this.fullScreenMode = 0;
 		this.setSceneSize(Config.sceneSize.two);
@@ -272,17 +282,20 @@ Editor.prototype = {
 
 	},
 
-	drawGraph : function( objects, data, dim, axesNames ) {
+	drawGraph : function( scene, data, dim, axesNames ) {
 		
 		var graphContainer = new THREE.Group();
 		var graphGroup = new THREE.Group();
-		if(dim.length == 2) graphGroup.position.set(-0.5, 0, 0);
-		if(dim.length == 3) graphGroup.position.set(-0.5, -ROOTTHREE/6, 0);
-		if(dim.length == 4) graphGroup.position.set(-0.5, -ROOTTHREE/9, -ROOTTHREE/6);
+		if(dim.length == 2) graphGroup.position.set(-0.5*Config.scalar, 0, 0);
+		if(dim.length == 3) graphGroup.position.set(-0.5*Config.scalar, -ROOTTHREE/6*Config.scalar, 0);
+		if(dim.length == 4) graphGroup.position.set(-0.5*Config.scalar, -ROOTTHREE/9*Config.scalar, -ROOTTHREE/6*Config.scalar);
 
 		graphGroup.add(this.drawWireframe( dim.length-1 ));
 		graphGroup.add(this.drawAxes( dim, axesNames ));
-		graphGroup.add(this.drawData( objects, data ));
+		// graphContainer.scale.set(100,100,100);
+		var points = this.drawData( data );
+		graphGroup.add(points);
+		scene.userData.objects = points;
 		graphContainer.add(graphGroup);
 		return graphContainer;	
 		
@@ -292,6 +305,7 @@ Editor.prototype = {
 		var group = new THREE.Group();
 		group.position.set(0,0,0);
 		group.name = 'wireframe';
+		group.scale.set(Config.scalar,Config.scalar,Config.scalar);
 		var geometry = new THREE.BufferGeometry();
 		var material = new THREE.LineBasicMaterial({ linewidth:5, color: 0xffffff, vertexColors: THREE.VertexColors });
 		var vertices;
@@ -457,7 +471,9 @@ Editor.prototype = {
 		var scope = this;
 		var group = new THREE.Group();
 		group.position.set(0,0,0);
+		
 		group.name = 'axesAndLabel';
+		group.scale.set(Config.scalar,Config.scalar,Config.scalar);
 
 		var axesGroup = new THREE.Group();
 		axesGroup.position.set(0,0,0);
@@ -707,8 +723,6 @@ Editor.prototype = {
 	},
 	
 	changeSpriteColorScheme: function ( parent, type ){
-		console.log(parent);
-
 	
 		for(let child of parent.children){
 			
@@ -719,19 +733,34 @@ Editor.prototype = {
 		
 
 	},
-	drawData: function( objects, data ){
+	drawData: function( data ){
 
 		var group = new THREE.Group();
-		group.name  = 'data';
+		// group.name  = 'data';
 		group.position.set(0, 0, 0);
+		var positions = [];
+		var colors = [];
+
+		var color = Config.colors.DATARED;
+		var geometry = new THREE.BufferGeometry();
 
 		for (let [name,pointInfo] of Object.entries(data)){
 		
-			var sprite = this.drawSprite(pointInfo.position, 0.02, Config.dataTexture, Config.colors.DATARED, name,pointInfo.frequence);
-			group.add( sprite );
-			objects.push(sprite);
+			positions.push( pointInfo.position.x, pointInfo.position.y, pointInfo.position.z );
+			colors.push( color.r, color.g, color.b );
+
+			// var sprite = this.drawSprite(pointInfo.position, 0.02, Config.dataTexture, Config.colors.DATARED, name,pointInfo.frequence);
+			// group.add( sprite );
+			// objects.push(sprite);
 		}
-		return group;		
+		geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ));
+		geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+		var material = new THREE.PointsMaterial( { size: 3, vertexColors: THREE.VertexColors, alphaTest: 0.5, depthTest: true,map:Config.dataTexture } );
+		var points = new THREE.Points( geometry, material );
+		points.name = 'data';
+		// group.add( points );
+
+		return points;		
 	},
 
 	drawSprite: function(position,scale,texture,color,name, freq){
@@ -740,7 +769,6 @@ Editor.prototype = {
 		var sprite = new THREE.Sprite( spriteMaterial );
 		sprite.scale.set(scale, scale, scale);
 		sprite.position.copy(position);
-		if(freq) sprite.freq = freq;
 		sprite.name = name;
 		return sprite;
 
@@ -765,13 +793,13 @@ Editor.prototype = {
 	
 		scene.userData.element = element.querySelector( ".scene" );
 		scope.viewport.appendChild( element );
-		console.log('append',scope.viewport.childNodes.length)
+	
 		var dom = scene.userData.element;
 		
 		var camera = new THREE.PerspectiveCamera( 50, 1);
 		camera.position.x = 0;
-		camera.position.z = 1.75;
-		
+		// camera.position.z = 1.75;
+		camera.position.z = 500;
 		scene.userData.camera = camera;
 		
 
@@ -790,16 +818,18 @@ Editor.prototype = {
 		// ADD ORBIT CONTROLS
 		var orbitControls = new THREE.OrbitControls( scene.userData.camera, scene.userData.element );
 		orbitControls.minDistance = 0.1;
-		orbitControls.maxDistance = 2;
+		orbitControls.maxDistance = 1500;
 		orbitControls.enablePan = false;
 		orbitControls.autoRotate = false;
 		// orbitControls.enableZoom = false;
 		scene.userData.orbitControls = orbitControls;
 
+		// scene.userData.objects = null;
+		//ADD AXIS AND DATA
+		var container = scope.drawGraph(scene, data, dim, axesNames );
 		//ADD OBJECT SELECTION CONTROLS
 		scope.objectPicking(scene);
-		//ADD AXIS AND DATA
-		var container = scope.drawGraph(scene.userData.objects, data, dim, axesNames );
+
 		scene.add( container );
 		scene.userData.animation = scope.createAnimation(container);
 		scope.signals.renderRequired.dispatch();
@@ -829,7 +859,8 @@ Editor.prototype = {
 		var scope = this;
 		var raycaster = scene.userData.raycaster = new THREE.Raycaster();
 		var mouse = scene.userData.mouse = new THREE.Vector2();
-		var objects = scene.userData.objects = [];
+		var objects = scene.userData.objects;
+
 		var camera = scene.userData.camera;
 		var container = scene.userData.element;
 		
@@ -841,7 +872,7 @@ Editor.prototype = {
 
 			raycaster.setFromCamera( mouse, camera );
 
-			return raycaster.intersectObjects( objects );
+			return raycaster.intersectObject( objects );
 
 		}
 
@@ -862,31 +893,13 @@ Editor.prototype = {
 			if ( onDownPosition.distanceTo( onUpPosition ) === 0 ) {
 			
 				var intersects = getIntersects( onUpPosition, objects );
-				//var intersects = []
 
 				if ( intersects.length > 0 ) {
 
-					var object = intersects[ 0 ].object;
-					
-					
-					if ( object.userData.object !== undefined ) {
+					scope.select( intersects[ 0 ] );
+	
 
-
-						
-					} else {
-						console.log('selected',object);
-						// console.log(scope.inputData.single[])
-						scope.select( object );
-
-					}
-
-				} else {
-
-					// editor.select( null );
-
-				}
-
-				// render();
+				} 
 
 			}
 
@@ -961,7 +974,6 @@ Editor.prototype = {
 		this.animationMode = 0;
 
 		this.addNewEdgeMode = 0;
-		this.selectionMode = 0;
 
 		this.resetViewport();
 		this.signals.editorCleared.dispatch();

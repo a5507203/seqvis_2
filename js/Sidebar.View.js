@@ -28,7 +28,7 @@ Sidebar.View = function ( editor ) {
 	
 	
 	var pointSizeRow = new UI.Row();
-	var pointSizeSlider = new UI.Slider(1,10,10);
+	var pointSizeSlider = new UI.Slider(2,8,6);
 
 	pointSizeRow.add(new UI.Text( 'Set point size' ).setWidth( '100px' ) );
 	pointSizeRow.add( pointSizeSlider );
@@ -38,12 +38,12 @@ Sidebar.View = function ( editor ) {
 	signals.editorCleared.add(function(){
 		theme.setValue('0');
 		editor.colorScheme = 0;
-		pointSizeSlider.setValue(10);
+		pointSizeSlider.setValue(6);
 	});
 	
 	pointSizeSlider.dom.oninput = function() {
 		
-		signals.pointSizeChanged.dispatch(this.value/500);
+		signals.pointSizeChanged.dispatch(this.value/2);
 
 	};
 	container.add( new UI.Break());
@@ -84,21 +84,22 @@ Sidebar.View = function ( editor ) {
 		updateInfoGui( objects );
 	});
 
-	function updateInfoGui(objects){
+	function updateInfoGui(indices){
 
 		parameters.clear();
-		var objectNameSet = new Set();
+
 		parameters.add( new UI.Break());
 
 		parameters.add(new UI.HorizontalRule());
 		parameters.add( new UI.Break());
 
-		for ( let object of objects){
-			if(objectNameSet.has(object.name)) continue;
-			objectNameSet.add(object.name);
+		var keyList = Object.keys(editor.inputData);
+		for ( let index of indices.values()){
+
+			var objectName = keyList[index];
 			// Sequence name
 			var nameRow = new UI.Row();
-			var name = new UI.Text(object.name).setFontSize( '15px' ).setTextAlign('center').setWidth('100%').setFontWeight('bold');
+			var name = new UI.Text(objectName).setFontSize( '15px' ).setTextAlign('center').setWidth('100%').setFontWeight('bold');
 			nameRow.add( name );
 			parameters.add( nameRow );
 			var freqHeaderRow = new UI.Row();
@@ -112,48 +113,48 @@ Sidebar.View = function ( editor ) {
 			freqHeaderRow.add( fa, ft, fg, fc );
 			parameters.add(freqHeaderRow);
 			//1st position freq
-			parameters.add( addFrequenceRow(editor.inputData[object.name].firstPositionFreq, '1st pos') );
+			parameters.add( addFrequenceRow(editor.inputData[objectName].firstPositionFreq, '1st pos') );
 
 			//2nd position freq
-			parameters.add( addFrequenceRow(editor.inputData[object.name].secondPositionFreq, '2nd pos') );
+			parameters.add( addFrequenceRow(editor.inputData[objectName].secondPositionFreq, '2nd pos') );
 
 			//3rd position freq
-			parameters.add( addFrequenceRow(editor.inputData[object.name].thirdPositionFreq, '3rd pos') );
+			parameters.add( addFrequenceRow(editor.inputData[objectName].thirdPositionFreq, '3rd pos') );
 
 			//All position freq
-			parameters.add( addFrequenceRow(editor.inputData[object.name].allPositionFreq, 'Total') );
+			parameters.add( addFrequenceRow(editor.inputData[objectName].allPositionFreq, 'Total') );
 			parameters.add( new UI.Break());
 			// current axes
-			var freqRow = new UI.Row();
-			// console.log(editor.inputData.single[name])
-			var freq = '';
-			// console.log(object.freq,object.name);
-			for ( let [key,value] of Object.entries(object.freq)){
-				freq += 'f'+key+': '+Math.round10(value,-2)+' ';
-			}
+			// var freqRow = new UI.Row();
+			// // console.log(editor.inputData.single[name])
+			// var freq = '';
+			// // console.log(object.freq,objectName);
+			// for ( let [key,value] of Object.entries(object.freq)){
+			// 	freq += 'f'+key+': '+Math.round10(value,-2)+' ';
+			// }
 			
-			freqRow.add( new UI.Text( 'Current Axes:' ).setWidth( '90px' ));
-			freqRow.add(  new UI.Text(freq) );
-			parameters.add( freqRow );
+			// freqRow.add( new UI.Text( 'Current Axes:' ).setWidth( '90px' ));
+			// freqRow.add(  new UI.Text(freq) );
+			// parameters.add( freqRow );
 
 			var seqLenRow = new UI.Row();
 			seqLenRow.add( new UI.Text( 'Sequence length:' ).setWidth( '120px' ));
-			seqLenRow.add(  new UI.Text(editor.inputData[object.name].totalLen) );
+			seqLenRow.add(  new UI.Text(editor.inputData[objectName].totalLen) );
 			parameters.add( seqLenRow );
 
 			var gapsRow = new UI.Row();
 			gapsRow.add( new UI.Text( 'Gaps:' ).setWidth( '120px' ));
-			gapsRow.add(  new UI.Text(editor.inputData[object.name].gapNum) );
+			gapsRow.add(  new UI.Text(editor.inputData[objectName].gapNum) );
 			parameters.add( gapsRow );
 
 			var unknownSeqNumRow = new UI.Row();
 			unknownSeqNumRow.add( new UI.Text( 'Unknown Nucl N:' ).setWidth( '120px' ));
-			unknownSeqNumRow.add(  new UI.Text(editor.inputData[object.name].unknownSeqNum) );
+			unknownSeqNumRow.add(  new UI.Text(editor.inputData[objectName].unknownSeqNum) );
 			parameters.add( unknownSeqNumRow );
 
 			var otherSeqNumRow = new UI.Row();
 			otherSeqNumRow.add( new UI.Text( 'Other Nucls:' ).setWidth( '120px' ));
-			otherSeqNumRow.add(  new UI.Text(editor.inputData[object.name].otherSeqNum) );
+			otherSeqNumRow.add(  new UI.Text(editor.inputData[objectName].otherSeqNum) );
 			parameters.add( otherSeqNumRow );
 		}
 	}
