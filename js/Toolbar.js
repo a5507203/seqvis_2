@@ -11,28 +11,28 @@ var Toolbar = function ( editor ) {
 
 
 	// three scenes in a row
-	var two = new UI.Button( 'Two' );
+	var two = new UI.Button(  ).setWidth('40px').setHeight('24px');
 	var currSelected = two;
 	var currRules = Config.sceneSize.two;
 	two.dom.classList.add( 'selected' );
-
+	two.dom.style['background-image'] = 'url(./image/icon_twoView.png)';
 	two.onClick( function () {
     	updateSceneSizeUI(2);
 	} );
 		buttons.add( two );
 
 	// three scenes in a row
-	var three = new UI.Button( 'Three' );
+	var three = new UI.Button( ).setWidth('40px').setHeight('24px');
 	// var currSelected = three;
 	// var currRules = Config.sceneSize.three;
-	
+	three.dom.style['background-image'] = 'url(./image/icon_threeView.png)';
 	three.onClick( function () {
     	updateSceneSizeUI(3);
 	} );
 	buttons.add( three );
 
-	var four = new UI.Button( 'Four' );
-	
+	var four = new UI.Button( ).setWidth('40px').setHeight('24px');
+	four.dom.style['background-image'] = 'url(./image/icon_fourView.png)';
 	four.onClick( function () {
 		updateSceneSizeUI(4);
 	} );
@@ -102,17 +102,19 @@ var Toolbar = function ( editor ) {
 
 
 
-	var playButton = new UI.Button( 'Play' ).setMarginLeft('20px');
-
+	var playButton = new UI.Button(  ).setMarginLeft('20px').setWidth('36px').setHeight('24px');
+	playButton.dom.style['background-image'] = 'url(./image/icon_play.png)';
 	playButton.onClick( function () {
 		if (playButton.dom.classList.contains( 'selected' )) {
 			playButton.dom.classList.remove( 'selected' );
 			signals.stopAnimations.dispatch( );
+			playButton.dom.style['background-image'] = 'url(./image/icon_play.png)';
 
 		}
 		else{
 			playButton.dom.classList.add( 'selected' );
 			signals.animationRequired.dispatch( );
+			playButton.dom.style['background-image'] = 'url(./image/icon_pause.png)';
 		}
 		// signals.selectionModeChanged.dispatch( 0 );
 	} );
@@ -122,26 +124,29 @@ var Toolbar = function ( editor ) {
 	
 
 	
-	var lockButton = new UI.Button( 'Lock' );
+	var lockButton = new UI.Button(  ).setWidth('36px').setHeight('24px');
 	lockButton.dom.classList.add( 'selected' );
+	lockButton.dom.style['background-image'] = 'url(./image/icon_lock.png)';
 
 	lockButton.onClick( function () {
 		if(editor.lockMode == 0) {
 			editor.lockMode = 1;
 			lockButton.dom.classList.add( 'selected' );
+			lockButton.dom.style['background-image'] = 'url(./image/icon_lock.png)';
 			
 		}
 		else {
 			editor.lockMode = 0;
 			lockButton.dom.classList.remove( 'selected' );
+			lockButton.dom.style['background-image'] = 'url(./image/icon_unlock.png)';
 			
 		}
 	} );
 	
 	buttons.add( lockButton );
 
-		var screenShotButton = new UI.Button( 'Scrn' );
-	
+	var screenShotButton = new UI.Button(  ).setWidth('36px').setHeight('24px');
+	screenShotButton.dom.style['background-image'] = 'url(./image/icon_camera.png)';
 	screenShotButton.onClick( function () {
 		
 		signals.screenShot.dispatch( );
