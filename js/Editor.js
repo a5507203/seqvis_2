@@ -62,7 +62,8 @@ var Editor = function (  ) {
 		dataPrepared: new Signal(),
 
 		hideChild: new Signal(),
-		selectionModeChanged: new Signal()
+		selectionModeChanged: new Signal(),
+		takeSvgImage : new Signal()
 	};
 
 
@@ -214,6 +215,17 @@ Editor.prototype = {
 		var sceneContainer = document.createElement('div');
 		sceneContainer.setAttribute('class','scene');
 
+		sceneContainer.addEventListener( 'dblclick', function(){
+			if ( scope.fullScreenMode == 0 ) {
+				scope.fullScreenMode = 1;
+				scope.signals.fullScreenMode.dispatch(true, scene);
+			}
+			else {
+				scope.fullScreenMode = 0;
+				scope.signals.fullScreenMode.dispatch(false, null);
+			}
+		}, false );
+
 		var footRow = document.createElement('div');
 		footRow.setAttribute('class','foot');
 		var description = document.createElement('div');
@@ -246,27 +258,17 @@ Editor.prototype = {
 		};
 		footRow.appendChild(toggleLabelButton);
 
-		var zoominButton = document.createElement('button');
-		zoominButton.setAttribute('class','optionButton');
-		// zoominButton.innerText ='full screen';
-		zoominButton.style['background-image'] = 'url(./image/resize.png)';
+		var svgButton = document.createElement('button');
+		svgButton.setAttribute('class','optionButton');
+		svgButton.style['background-image'] = 'url(./image/icon_svg.png)';
 		
-		zoominButton.onclick = function(){
-			if ( scope.fullScreenMode == 0 ) {
-				scope.fullScreenMode = 1;
-				scope.signals.fullScreenMode.dispatch(true, scene);
-			}
-			else {
-				scope.fullScreenMode = 0;
-				scope.signals.fullScreenMode.dispatch(false, null);
-			}
-				
+		svgButton.onclick = function(){
+			scope.signals.takeSvgImage.dispatch(scene);
 		};
-		footRow.appendChild(zoominButton);
+		footRow.appendChild(svgButton);
 
 		var closeButton = document.createElement('button');
 		closeButton.setAttribute('class','optionButton');
-		// closeButton.innerText =String.fromCodePoint(0x2716);
 		closeButton.style['background-image'] = 'url(./image/cross.png)';
 		closeButton.onclick = function(){
 			//TODO signal based or not
@@ -306,8 +308,19 @@ Editor.prototype = {
 		group.position.set(0,0,0);
 		group.name = 'wireframe';
 		group.scale.set(Config.scalar,Config.scalar,Config.scalar);
-		var geometry = new THREE.BufferGeometry();
-		var material = new THREE.LineBasicMaterial({ linewidth:5, color: 0xffffff, vertexColors: THREE.VertexColors });
+		// var geometry = new THREE.BufferGeometry();
+		// var material = new THREE.LineBasicMaterial({ linewidth:5, color: 0xffffff, vertexColors: THREE.VertexColors });
+
+		var geometry = new THREE.LineSegmentsGeometry();
+
+
+		var material = new THREE.LineMaterial( {
+					color: 0xffffff,
+					linewidth: 0.01, // in pixels
+					vertexColors: THREE.VertexColors,
+					//resolution:  // to be set by renderer, eventually
+					dashed: false
+		} );
 		var vertices;
 
 		var coloredColors;
@@ -440,12 +453,14 @@ Editor.prototype = {
 		}
 		
 		geometry.colored = coloredColors;
-		geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+		geometry.bcolored = blackColors;
+		// geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+		geometry.setPositions( vertices );
 		
-		if(this.colorScheme == 0) geometry.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array(coloredColors), 3 ) );
-		else geometry.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array(blackColors), 3 ) );
-		
-		group.add( new THREE.LineSegments( geometry, material ));
+		if(this.colorScheme == 0) geometry.setColors( coloredColors );
+		else geometry.setColors( blackColors );
+
+		group.add( new THREE.LineSegments2( geometry, material ));
 		return group;
 	},
 
@@ -591,6 +606,7 @@ Editor.prototype = {
 		// this.calcuateLabel(new THREE.Vector3(0.5, ROOTSIX/3, ROOTTHREE/6),new THREE.Vector3(0.5, ROOTSIX/9, ROOTTHREE/6));
 		// this.calcuateLabel(new THREE.Vector3(0.5, 0, ROOTTHREE/2),new THREE.Vector3(0.5, ROOTSIX/9, ROOTTHREE/6));
 		geometry.colored = coloredColors;
+		geometry.bcolored = blackColors;
 		geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
 		
 		if(this.colorScheme == 0) geometry.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array(coloredColors), 3 ) );
@@ -700,8 +716,7 @@ Editor.prototype = {
 			var colorAttribute = child.geometry.attributes.color;
 			var colored = child.geometry.colored;
 			var colorArray = colorAttribute.array;
-			if( type == '0' ){
-				
+			if( type == '0' ){		
 				
 				for( var index = 0; index < colorArray.length; index += 1 ) {
 					
@@ -717,6 +732,26 @@ Editor.prototype = {
 			}
 			colorAttribute.needsUpdate = true;
 			
+			
+		}
+
+	},
+	changeLineGeometryColorScheme : function ( parent, type ){
+	
+		
+		for(let child of parent.children){
+		
+			// var colored = child.geometry.colored;
+		
+			if( type == '0' ){		
+				child.geometry.setColors(child.geometry.colored);
+	
+			}
+			else{
+				child.geometry.setColors(child.geometry.bcolored);
+	
+			}
+		
 			
 		}
 
@@ -749,9 +784,6 @@ Editor.prototype = {
 			positions.push( pointInfo.position.x, pointInfo.position.y, pointInfo.position.z );
 			colors.push( color.r, color.g, color.b );
 
-			// var sprite = this.drawSprite(pointInfo.position, 0.02, Config.dataTexture, Config.colors.DATARED, name,pointInfo.frequence);
-			// group.add( sprite );
-			// objects.push(sprite);
 		}
 		geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ));
 		geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
@@ -778,31 +810,16 @@ Editor.prototype = {
 		var scope = this;
 		var geometries = [
 			new THREE.ConeBufferGeometry( 2, 3, 3 ),
-
 		];
 
-		var i = scope.scenes.length;
 		var scene = new THREE.Scene();
-		// scene.name = i;
-		// CREATE PERSPECTIVE CAMERA
-
 
 		// CREATE ELEMENT IN HTML
-		// var element = this.createSceneContainer(dim.join(),scene);
 		var element = this.createSceneContainer(sceneName,scene);
-	
 		scene.userData.element = element.querySelector( ".scene" );
 		scope.viewport.appendChild( element );
-	
 		var dom = scene.userData.element;
 		
-		var camera = new THREE.PerspectiveCamera( 50, 1);
-		camera.position.x = 0;
-		// camera.position.z = 1.75;
-		camera.position.z = 500;
-		scene.userData.camera = camera;
-		
-
 		// ADD LIGHT
 		var light = new THREE.AmbientLight( 0x404040 ); // soft white light
 		scene.add( light );
@@ -810,49 +827,54 @@ Editor.prototype = {
 		else scene.background = Config.colors.SCENELIGHT;
 		scope.scenes.push( scene );
 
-		
-
+		// CREATE PERSPECTIVE CAMERA
+		var camera = new THREE.PerspectiveCamera( 50, 1);
+		camera.position.x = 0;
+		camera.position.z = 500;
+		scene.userData.camera = camera;
 		camera.aspect = dom.offsetWidth / dom.offsetHeight;
 		camera.updateProjectionMatrix();
 
 		// ADD ORBIT CONTROLS
 		var orbitControls = new THREE.OrbitControls( scene.userData.camera, scene.userData.element );
 		orbitControls.minDistance = 0.1;
-		orbitControls.maxDistance = 1500;
+		orbitControls.maxDistance = 700;
 		orbitControls.enablePan = false;
 		orbitControls.autoRotate = false;
 		// orbitControls.enableZoom = false;
-		scene.userData.orbitControls = orbitControls;
-
-		// scene.userData.objects = null;
-		//ADD AXIS AND DATA
-		var container = scope.drawGraph(scene, data, dim, axesNames );
-		//ADD OBJECT SELECTION CONTROLS
-		scope.objectPicking(scene);
-
-		scene.add( container );
-		scene.userData.animation = scope.createAnimation(container);
-		scope.signals.renderRequired.dispatch();
 		orbitControls.addEventListener('change', function(){
 			
 			if (scope.lockMode == 1 ){
+
 				scope.scenes.forEach(function (otherScene) {
+
 					if(scene != otherScene) {
 						var otherCamera  = otherScene.userData.camera;
 						var camera = scene.userData.camera;
 						otherCamera.position.copy(camera.position);
 						otherCamera.scale.copy(camera.scale);
 						otherCamera.rotation.copy(camera.rotation);
-						// otherCamera.rotation = scene.userData.camera.rotation.clone();
-
-						
 					}
-					// body...
+					
 				});
-				
+
 			}
+
 			scope.signals.renderRequired.dispatch();
 		});
+		scene.userData.orbitControls = orbitControls;
+
+		//ADD AXIS AND DATA
+		var container = scope.drawGraph(scene, data, dim, axesNames );
+		scene.add( container );
+
+		//ADD OBJECT SELECTION CONTROLS
+		scope.objectPicking(scene);
+
+		//CREATE TWEEN ANIMATION
+		scene.userData.animation = scope.createAnimation(container);
+		scope.signals.renderRequired.dispatch();
+
 	},
 
 	objectPicking:function(scene){
@@ -860,7 +882,6 @@ Editor.prototype = {
 		var raycaster = scene.userData.raycaster = new THREE.Raycaster();
 		var mouse = scene.userData.mouse = new THREE.Vector2();
 		var objects = scene.userData.objects;
-
 		var camera = scene.userData.camera;
 		var container = scene.userData.element;
 		
@@ -911,7 +932,6 @@ Editor.prototype = {
 		
 			var array = getMousePosition( container, event.clientX, event.clientY );
 			onDownPosition.fromArray( array );
-
 
 			document.addEventListener( 'mouseup', onMouseUp, false );
 

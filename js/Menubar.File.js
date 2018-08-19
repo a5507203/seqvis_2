@@ -59,12 +59,3 @@ Menubar.File = function ( editor ) {
 
 };
 
-function save( blob, filename ) {
-
-	link.href = URL.createObjectURL( blob );
-	link.download = filename || 'data.json';
-	link.click();
-
-	// URL.revokeObjectURL( url ); breaks Firefox...
-
-}

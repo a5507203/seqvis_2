@@ -10,9 +10,15 @@ var Viewport = function ( editor ) {
 	};
 	var scenes = editor.scenes;
 
-	var renderer =  new THREE.WebGLRenderer( { canvas: canvas, antialias: true } );
+	var svgRenderer = new THREE.SVGRenderer();
+ 	svgRenderer.setSize( window.innerWidth, window.innerHeight );
+	svgRenderer.setClearColor( 0xffffff, 1 );
+
+	var renderer =  new THREE.WebGLRenderer( { canvas: canvas, antialias: false } );
 	renderer.setClearColor( 0xffffff, 1 );
 	renderer.setPixelRatio( window.devicePixelRatio );
+	renderer.autoClear = false;
+	renderer.autoUpdateScene = false;
 
 	var sceneHelpers = editor.sceneHelpers;
 
@@ -26,8 +32,10 @@ var Viewport = function ( editor ) {
 	});
 
 	signals.sceneResize.add(function(){
+
 		sceneResize();
 		renderAll();
+
 	});
 
 	signals.windowResize.add( function () {
@@ -65,13 +73,14 @@ var Viewport = function ( editor ) {
 			
 		editor.colorScheme = type;
 
-			
 		for ( var scene of scenes ) {
 			if(type == 0 ) scene.background =  Config.colors.SCENEDARK;
 			else scene.background =  Config.colors.SCENELIGHT;
 			
 			var wireframe = scene.children[1].children[0].children[0];
-			editor.changeBufferGeometryColorScheme(wireframe,type);
+			//editor.changeBufferGeometryColorScheme(wireframe,type);
+				
+			editor.changeLineGeometryColorScheme(wireframe,type);
 			
 			var axes = scene.children[1].children[0].children[1].children[0];
 			editor.changeBufferGeometryColorScheme(axes,type);
@@ -81,12 +90,6 @@ var Viewport = function ( editor ) {
 			
 			renderAll();
 		}
-
-		
-		
-		
-	
-	
 		
 	} );
 
@@ -108,11 +111,43 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	signals.screenShot.add(screenShot );
+	signals.screenShot.add( function() {
+		
+		// var w = window.open('', '');
+		renderAll();
 
-	signals.hideChild.add(function(parent, childName){
+		renderer.domElement.toBlob(function(blob){
+			var a = document.createElement('a');
+			var url = URL.createObjectURL(blob);
+			a.href = url;
+			a.download = 'scenes.png';
+			a.click();
+		}, 'image/png', 1.0);
+
+		// var imgData = renderer.domElement.toDataURL();
+		// var img = new Image();
+		// img.src = imgData;
+		// w.document.body.appendChild(img);  
+
+	} );
+
+	signals.takeSvgImage.add( function(scene) {
+
+		var  XMLS = new XMLSerializer();
+
+		svgRenderer.setClearColor( 0xffffff );
+		svgRenderer.clear();
+		svgRenderer.setClearColor( 0xe0e0e0 );
+
+		svgRenderer.render( scene, scene.userData.camera );
+		var svgData = XMLS.serializeToString(svgRenderer.domElement);
+		save(new Blob([svgData], {type:"image/svg+xml;charset=utf-8"}));
+	} );
+
+
+	signals.hideChild.add( function(parent, childName) {
+
 		var child;
-		console.log(parent,childName);
 		if(childName == 'wireframe') child = parent.children[1].children[0].children[0];
 		
 		else if(childName == 'axes') child = parent.children[1].children[0].children[1].children[0];
@@ -123,19 +158,18 @@ var Viewport = function ( editor ) {
 		else child.visible = true;
 		renderAll();
 	
+	} );
 
-	});
+	function sceneResize() {
 
-	function sceneResize(){
 		scenes.forEach( function( scene ) {
 			var camera = scene.userData.camera;
 			var dom = scene.userData.element;
-
 			camera.aspect = dom.offsetWidth / dom.offsetHeight;
 			camera.updateProjectionMatrix();
-			// render(scene);
 	
 		});
+
 	}
 
 
@@ -168,22 +202,6 @@ var Viewport = function ( editor ) {
 
 	}
 	
-
-	
-	function screenShot(){
-		
-		var w = window.open('', '');
-			renderAll();
-			var imgData = renderer.domElement.toDataURL();     
-		
-			var img = new Image();
-			
-			img.src = imgData;
-			w.document.body.appendChild(img);  
- 
-
-	}
-
 	
 	function render(scene){
 		var element = scene.userData.element;
@@ -212,7 +230,19 @@ var Viewport = function ( editor ) {
 		
 	}
 
-
-	
-
 };
+
+
+var link = document.createElement( 'a' );
+link.style.display = 'none';
+document.body.appendChild( link ); 
+
+function save( blob, filename ) {
+
+	link.href = URL.createObjectURL( blob );
+	link.download = filename || 'scene.svg';
+	link.click();
+
+	// URL.revokeObjectURL( url ); breaks Firefox...
+
+}

@@ -28,7 +28,7 @@ Sidebar.View = function ( editor ) {
 	
 	
 	var pointSizeRow = new UI.Row();
-	var pointSizeSlider = new UI.Slider(2,8,6);
+	var pointSizeSlider = new UI.Slider(2,20,6);
 
 	pointSizeRow.add(new UI.Text( 'Set point size' ).setWidth( '100px' ) );
 	pointSizeRow.add( pointSizeSlider );
