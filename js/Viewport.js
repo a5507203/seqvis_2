@@ -11,8 +11,8 @@ var Viewport = function ( editor ) {
 	var scenes = editor.scenes;
 
 	var svgRenderer = new THREE.SVGRenderer();
- 	svgRenderer.setSize( window.innerWidth, window.innerHeight );
-	svgRenderer.setClearColor( 0xffffff, 1 );
+ 	
+	svgRenderer.setClearColor( 0x000000 );
 
 	var renderer =  new THREE.WebGLRenderer( { canvas: canvas, antialias: false } );
 	renderer.setClearColor( 0xffffff, 1 );
@@ -83,7 +83,7 @@ var Viewport = function ( editor ) {
 			editor.changeLineGeometryColorScheme(wireframe,type);
 			
 			var axes = scene.children[1].children[0].children[1].children[0];
-			editor.changeBufferGeometryColorScheme(axes,type);
+			editor.changeLineGeometryColorScheme(axes,type);
 			
 			var labels = scene.children[1].children[0].children[1].children[1];
 			editor.changeSpriteColorScheme(labels,type);
@@ -133,13 +133,21 @@ var Viewport = function ( editor ) {
 
 	signals.takeSvgImage.add( function(scene) {
 
-		var  XMLS = new XMLSerializer();
+		//clone scene
+		var svgScene = new THREE.Scene();
+		svgScene.background = Config.colors.SCENELIGHT;
+		svgScene.add( new THREE.AmbientLight( 0x404040 ) );
+		svgScene.add(editor.drawGraph(scene, 'svg', scene.userData.dimNo, scene.userData.axesNames));
+	
 
-		svgRenderer.setClearColor( 0xffffff );
+		var XMLS = new XMLSerializer();
+		svgRenderer.setSize( scene.userData.element.clientWidth*5, scene.userData.element.clientHeight*5 );
+		// svgRenderer.setSize( canvas.width, canvas.height, false );
+
 		svgRenderer.clear();
-		svgRenderer.setClearColor( 0xe0e0e0 );
+		svgRenderer.setQuality('high');
 
-		svgRenderer.render( scene, scene.userData.camera );
+		svgRenderer.render( svgScene, scene.userData.camera );
 		var svgData = XMLS.serializeToString(svgRenderer.domElement);
 		save(new Blob([svgData], {type:"image/svg+xml;charset=utf-8"}));
 	} );

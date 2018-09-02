@@ -284,56 +284,115 @@ Editor.prototype = {
 
 	},
 
-	drawGraph : function( scene, data, dim, axesNames ) {
+	drawGraph : function( scene, renderType, dimNo, axesNames, data  ) {
 		
 		var graphContainer = new THREE.Group();
 		var graphGroup = new THREE.Group();
-		if(dim.length == 2) graphGroup.position.set(-0.5*Config.scalar, 0, 0);
-		if(dim.length == 3) graphGroup.position.set(-0.5*Config.scalar, -ROOTTHREE/6*Config.scalar, 0);
-		if(dim.length == 4) graphGroup.position.set(-0.5*Config.scalar, -ROOTTHREE/9*Config.scalar, -ROOTTHREE/6*Config.scalar);
-
-		graphGroup.add(this.drawWireframe( dim.length-1 ));
-		graphGroup.add(this.drawAxes( dim, axesNames ));
-		// graphContainer.scale.set(100,100,100);
-		var points = this.drawData( data );
-		graphGroup.add(points);
-		scene.userData.objects = points;
 		graphContainer.add(graphGroup);
+
+		if(dimNo == 1) graphGroup.position.set(-0.5*Config.scalar, 0, 0);
+		if(dimNo == 2) graphGroup.position.set(-0.5*Config.scalar, -ROOTTHREE/6*Config.scalar, 0);
+		if(dimNo == 3) graphGroup.position.set(-0.5*Config.scalar, -ROOTTHREE/9*Config.scalar, -ROOTTHREE/6*Config.scalar);
+	
+
+		var points;
+		if(renderType == 'render'){
+			graphGroup.add(this.drawWireframe( dimNo, renderType,true ));
+			graphGroup.add(this.drawAxes( dimNo, axesNames, renderType, true, true ));
+			points = this.drawData( data );
+
+			scene.userData.objects = points;
+			scene.userData.dimNo = dimNo;
+			scene.userData.axesNames = axesNames;
+		}else{
+			graphGroup.add(this.drawWireframe( dimNo, renderType,scene.children[1].children[0].children[0].visible ));
+		
+			graphGroup.add(this.drawAxes( dimNo, axesNames, renderType, scene.children[1].children[0].children[1].children[0].visible, scene.children[1].children[0].children[1].children[1].visible,  scene.userData.camera.quaternion ));
+			
+			points = scene.children[1].children[0].children[2].clone();
+			points.material.color = Config.colors.BLACK;
+			points.material.needsUpdate = true;
+		}
+		graphGroup.add(points);
+
+	
+
+	
 		return graphContainer;	
 		
 	}, 
 
-	drawWireframe : function ( dim ) {
+	// drawSVGScene: function( scene ){
+		
+	// 	var dim  = scene.userData.dim;
+	// 	var svgScene = new THREE.Scene();
+	// 	svgScene.background = Config.colors.SCENELIGHT;
+	// 	svgScene.add( new THREE.AmbientLight( 0x404040 ) );
+	// 	var graphContainer = new THREE.Group();
+	// 	var graphGroup = new THREE.Group();
+	// 	graphContainer.add(graphGroup);
+	// 	svgScene.add(graphContainer);
+			
+	// 	if(dim == 1) graphGroup.position.set(-0.5*Config.scalar, 0, 0);
+	// 	if(dim == 2) graphGroup.position.set(-0.5*Config.scalar, -ROOTTHREE/6*Config.scalar, 0);
+	// 	if(dim == 3) graphGroup.position.set(-0.5*Config.scalar, -ROOTTHREE/9*Config.scalar, -ROOTTHREE/6*Config.scalar);
+
+	// 	graphGroup.add(this.drawWireframe( scene.userData.dim, 'svg' ));
+		
+	// 	return svgScene;
+
+	// },
+
+	drawLineSegments2 : function (geoBColor,geoCColor, linewidth, vertices){
+
+		var geometry = new THREE.LineSegmentsGeometry();
+		geometry.colored = geoCColor;
+		geometry.bcolored = geoBColor;
+		geometry.setPositions(vertices);
+		if(this.colorScheme == 0) geometry.setColors( geoCColor );
+		else geometry.setColors( geoBColor );
+
+		var material = new THREE.LineMaterial( {
+			color: 0xffffff,
+			linewidth: linewidth, 
+			vertexColors: THREE.VertexColors,
+			//resolution:  // to be set by renderer, eventually
+			dashed: false
+		} );
+	
+		return new THREE.LineSegments2( geometry, material );
+	},
+
+	drawLineSegments : function (linewidth, vertices){
+
+		var geometry = new THREE.BufferGeometry();
+		// geometry.colored = geoCColor;
+		// geometry.bcolored = geoBColor;
+		geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array(vertices), 3 ) );
+		// geometry.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array(geoBColor), 3 ) );
+		var material = new THREE.LineBasicMaterial({ linewidth:5, color: 0x00000 });
+
+		return new THREE.LineSegments( geometry, material );
+	},
+
+	drawWireframe : function ( dimNo, type,drawWireframe ) {
 		var group = new THREE.Group();
 		group.position.set(0,0,0);
 		group.name = 'wireframe';
 		group.scale.set(Config.scalar,Config.scalar,Config.scalar);
-		// var geometry = new THREE.BufferGeometry();
-		// var material = new THREE.LineBasicMaterial({ linewidth:5, color: 0xffffff, vertexColors: THREE.VertexColors });
 
-		var geometry = new THREE.LineSegmentsGeometry();
-
-
-		var material = new THREE.LineMaterial( {
-					color: 0xffffff,
-					linewidth: 0.01, // in pixels
-					vertexColors: THREE.VertexColors,
-					//resolution:  // to be set by renderer, eventually
-					dashed: false
-		} );
 		var vertices;
-
 		var coloredColors;
 		var blackColors;
 
 		// DRAW GRAPH SHAPES
-		if(dim == 1) {
+		if(dimNo == 1) {
 		
-			vertices = new Float32Array( [
+			vertices =[
 				//l-r
 				0, 0, 0,
 				1, 0, 0
-			] );
+			];
 			
 			coloredColors =  [
 				1, 0, 0,
@@ -345,12 +404,11 @@ Editor.prototype = {
 				0, 0, 0
 			];
 			
-			
 		}
 		
-		else if(dim == 2) {
+		else if(dimNo == 2) {
 
-			vertices = new Float32Array( [
+			vertices =[
 				//t-l
 				0.5, ROOTTHREE/2, 0,
 				0, 0, 0,
@@ -360,7 +418,7 @@ Editor.prototype = {
 				//l-r
 				0, 0, 0,
 				1, 0, 0
-			] );
+			];
 			
 			coloredColors = [
 				0, 1, 0, 
@@ -386,9 +444,9 @@ Editor.prototype = {
 
 		}
 		
-		else if(dim == 3) {
+		else if(dimNo == 3) {
 		
-			vertices = new Float32Array( [
+			vertices =  [
 				//t-l
 				0.5, ROOTSIX/3, ROOTTHREE/6,
 				0, 0, 0,
@@ -407,9 +465,7 @@ Editor.prototype = {
 				//r-f
 				1, 0, 0,
 				0.5, 0, ROOTTHREE/2
-			
-
-			] );
+			];
 			
 			coloredColors = [
 				0, 1, 0, 
@@ -451,16 +507,8 @@ Editor.prototype = {
 				0, 0, 0
 			];			
 		}
-		
-		geometry.colored = coloredColors;
-		geometry.bcolored = blackColors;
-		// geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
-		geometry.setPositions( vertices );
-		
-		if(this.colorScheme == 0) geometry.setColors( coloredColors );
-		else geometry.setColors( blackColors );
-
-		group.add( new THREE.LineSegments2( geometry, material ));
+		if(type == 'render') group.add(this.drawLineSegments2(blackColors,coloredColors, Config.lineWidth, vertices));
+		else if(drawWireframe) group.add(this.drawLineSegments(Config.lineWidth, vertices));
 		return group;
 	},
 
@@ -481,8 +529,8 @@ Editor.prototype = {
 
 	},
 
-	drawAxes: function ( dim, axesNames ) {
-	
+	drawAxes: function ( dimNo, axesNames, renderType, drawAxes, drawLabels, quaternion ) {
+
 		var scope = this;
 		var group = new THREE.Group();
 		group.position.set(0,0,0);
@@ -499,24 +547,31 @@ Editor.prototype = {
 
 		group.add(axesGroup);
 		// group.add(labelsGroup);
+	
+		if(renderType == 'render'){
+			scope.drawAxesLabels(axesNames,function(axeslabelgroup){
+
+				group.add(axeslabelgroup);
+				scope.signals.renderRequired.dispatch();
+
+			});
+		}
+
+		else if(drawLabels) {
+			group.add(scope.drawSVGAxesLabels(axesNames,quaternion));
+
+		}
+
 		
-		scope.drawAxesLabels(axesNames,function(axeslabelgroup){
 
-			group.add(axeslabelgroup);
-			scope.signals.renderRequired.dispatch();
-			
+		if (dimNo <= 1)  return group;
 
-		});
-
-		if (dim.length <= 2)  return group;
-		var geometry = new THREE.BufferGeometry();
-		var material = new THREE.LineBasicMaterial({ linewidth:5, color: 0xffffff, vertexColors: THREE.VertexColors });
 		var vertices;
 		var coloredColors;
 		var blackColors;
 
-		if(dim.length == 3  ){
-			vertices = new Float32Array( [
+		if(dimNo == 2  ){
+			vertices = [
 				
 				0.5866, 0.3387, 0,
 				0, 0, 0,
@@ -527,7 +582,7 @@ Editor.prototype = {
 				0.5, 0.1887, 0,
 				0.5, ROOTTHREE/2, 0,
 
-			] );
+			] ;
 
 			coloredColors = [
 				1, 0, 0, 
@@ -553,9 +608,9 @@ Editor.prototype = {
 			];
 		}
 
-		else if( dim.length == 4 ){
+		else if( dimNo == 3 ){
 
-			vertices = new Float32Array( [
+			vertices =  [
 				
 				0.5783, 0.3148, 0.3339,
 				0, 0, 0,
@@ -569,7 +624,7 @@ Editor.prototype = {
 				0.5, 0.3148, 0.1982,
 				0.5, 0, ROOTTHREE/2
 
-			] );
+			] ;
 
 			coloredColors = [
 				1, 0, 0, 
@@ -600,19 +655,15 @@ Editor.prototype = {
 			];
 		}
 			
-		// geometry.alternativeColor = 
+
 		// this.calcuateLabel(new THREE.Vector3(0, 0, 0),new THREE.Vector3(0.5, ROOTSIX/9, ROOTTHREE/6));
 		// this.calcuateLabel(new THREE.Vector3(1, 0, 0),new THREE.Vector3(0.5, ROOTSIX/9, ROOTTHREE/6));
 		// this.calcuateLabel(new THREE.Vector3(0.5, ROOTSIX/3, ROOTTHREE/6),new THREE.Vector3(0.5, ROOTSIX/9, ROOTTHREE/6));
 		// this.calcuateLabel(new THREE.Vector3(0.5, 0, ROOTTHREE/2),new THREE.Vector3(0.5, ROOTSIX/9, ROOTTHREE/6));
-		geometry.colored = coloredColors;
-		geometry.bcolored = blackColors;
-		geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
-		
-		if(this.colorScheme == 0) geometry.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array(coloredColors), 3 ) );
-		else geometry.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array(blackColors), 3 ) );
-	
-		axesGroup.add( new THREE.LineSegments( geometry, material ));
+
+		if(renderType == 'render') axesGroup.add(this.drawLineSegments2(blackColors,coloredColors, Config.lineWidth, vertices));
+		else if(drawAxes) axesGroup.add(this.drawLineSegments(Config.lineWidth, vertices));
+
 		return group;
 
 
@@ -642,6 +693,65 @@ Editor.prototype = {
 	
 			scene.userData.animation.start();
 		}
+
+	},
+	drawSVGAxesLabels :function(axesNames,quaternion){
+
+		var scope = this;
+		var group = new THREE.Group();
+		group.position.set(0,0,0);
+		var coloredColors;
+		var len = axesNames.length;
+		var coordinates;
+		if( len == 2 ) {
+			coordinates = [
+				new THREE.Vector3(0,0,0),
+				new THREE.Vector3(1,0,0)
+			];
+		}
+		else if(len == 3) {
+			coordinates = [
+				new THREE.Vector3( 0.5, 0.9661, 0 ),
+				new THREE.Vector3( -0.0866, -0.05, 0 ),
+				new THREE.Vector3( 1.0866, -0.05, 0 )
+			];
+		}
+		else if (len == 4) {
+			coordinates = [	
+				new THREE.Vector3 ( 0.5, 0.9165, 0.2887),
+				new THREE.Vector3 ( -0.0783,  -0.0426,  -0.0452),
+				new THREE.Vector3 ( 1.0783, -0.0426, -0.0452),
+				new THREE.Vector3 ( 0.5, -0.0426, 0.9565)
+			];
+		}
+
+
+
+		var matLite = new THREE.MeshBasicMaterial( {
+			color: 0x000000,
+			side: THREE.DoubleSide
+		} );
+		
+		for ( var i = 0;i<len;i+=1){
+
+			var xMid, text;
+			var textGroup = new THREE.Group();
+			textGroup.position.copy(coordinates[i]);
+			textGroup.quaternion.copy( quaternion );
+			
+			var shapes = Config.font.generateShapes( axesNames[i],0.125);
+			var geometry = new THREE.ShapeBufferGeometry( shapes );
+			geometry.computeBoundingBox();
+			xMid = - 0.5 * ( geometry.boundingBox.max.x - geometry.boundingBox.min.x );
+			var p = coordinates[i];
+			geometry.translate( xMid,0,0 );
+			text = new THREE.Mesh( geometry, matLite );
+			textGroup.add(text);
+			group.add( textGroup );
+
+
+		}
+		return group;
 
 	},
 
@@ -682,7 +792,7 @@ Editor.prototype = {
 
 		var loader = new THREE.TextureLoader();
 
-		function drawAxis(axesName, coordinate, color){
+		function drawLabels(axesName, coordinate, color){
 			loader.load(
 			
 				'./image/'+axesName+'.png',
@@ -703,14 +813,14 @@ Editor.prototype = {
 
 		for ( var i = 0;i<len;i+=1){
 
-			drawAxis(axesNames[i],coordinates[i],coloredColors[i]);
+			drawLabels(axesNames[i],coordinates[i],coloredColors[i]);
 
 		}
+		
 		return group;
 	},
 	
 	changeBufferGeometryColorScheme : function ( parent, type ){
-	
 		
 		for(let child of parent.children){
 			var colorAttribute = child.geometry.attributes.color;
@@ -806,12 +916,9 @@ Editor.prototype = {
 
 	},
 
+
 	addScene: function(sceneName, data, dim, axesNames ){
 		var scope = this;
-		var geometries = [
-			new THREE.ConeBufferGeometry( 2, 3, 3 ),
-		];
-
 		var scene = new THREE.Scene();
 
 		// CREATE ELEMENT IN HTML
@@ -865,7 +972,7 @@ Editor.prototype = {
 		scene.userData.orbitControls = orbitControls;
 
 		//ADD AXIS AND DATA
-		var container = scope.drawGraph(scene, data, dim, axesNames );
+		var container = scope.drawGraph(scene,'render', dim.length-1, axesNames,data );
 		scene.add( container );
 
 		//ADD OBJECT SELECTION CONTROLS
@@ -972,12 +1079,9 @@ Editor.prototype = {
 
 		}
 
-
 		container.addEventListener( 'mousedown', onMouseDown, false );
 		container.addEventListener( 'touchstart', onTouchStart, false );
 
-
-		
 	},
 
 	setSceneSize: function(rules){

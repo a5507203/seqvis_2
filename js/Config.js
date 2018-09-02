@@ -12,9 +12,11 @@ var Config = {
         SCENELIGHT: new THREE.Color(0xffffff),
         DATARED: new THREE.Color(0xff3721),
         BLACK: new THREE.Color(0x000000),
-        SELECTED: new THREE.Color(0x00ff00)
+        SELECTED: new THREE.Color(0x00ff00),
+        
     },
-    scalar:300
+    scalar:300,
+    lineWidth: 0.007
     
 
     // colorScheme:{

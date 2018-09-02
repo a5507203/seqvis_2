@@ -124,33 +124,38 @@
 				};
 
 				var textureloader = new THREE.TextureLoader();
+				var fontLader = new THREE.FontLoader();
 				textureloader.load( './image/disc.png', function( texture ) {
 					Config.dataTexture = texture;
-					console.log('loaded');
-					var editor = new Editor();
+					fontLader.load( './fonts/helvetiker_regular.typeface.json', function ( font ) {
+						Config.font = font;
+						Config.dataTexture = texture;
+						console.log('loaded');
+						var editor = new Editor();
 
-					var menubar = new Menubar( editor );
-					document.body.appendChild( menubar.dom );	
-		
-					var viewport = new Viewport( editor );
+						var menubar = new Menubar( editor );
+						document.body.appendChild( menubar.dom );	
+			
+						var viewport = new Viewport( editor );
 
-					var loadFile  = new FileLoader(editor);
-					
-					var sidebar = new Sidebar( editor );
-					document.body.appendChild( sidebar.dom );
-		
-					var toolbar = new Toolbar(editor);
-					document.body.appendChild(toolbar.dom);
-		
-					function onWindowResize( event ) {
-		
-					editor.signals.windowResize.dispatch();
-		
-					}
-		
-					window.addEventListener( 'resize', onWindowResize, false );
-		
-					onWindowResize();
+						var loadFile  = new FileLoader(editor);
+						
+						var sidebar = new Sidebar( editor );
+						document.body.appendChild( sidebar.dom );
+			
+						var toolbar = new Toolbar(editor);
+						document.body.appendChild(toolbar.dom);
+			
+						function onWindowResize( event ) {
+			
+						editor.signals.windowResize.dispatch();
+			
+						}
+			
+						window.addEventListener( 'resize', onWindowResize, false );
+			
+						onWindowResize();
+					});
 				}, false );
 
 			}

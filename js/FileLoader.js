@@ -212,30 +212,30 @@ FileLoader.prototype = {
             }
             else {
                 otherSeqNum += 1;
-                allPositionFreq['A']+=0.25;
-                allPositionFreq['G']+=0.25;
-                allPositionFreq['C']+=0.25;
-                allPositionFreq['T']+=0.25;
+                // allPositionFreq['A']+=0.25;
+                // allPositionFreq['G']+=0.25;
+                // allPositionFreq['C']+=0.25;
+                // allPositionFreq['T']+=0.25;
                 if(i%3==0){
                     firstPositionLen += 1; 
-                    firstPositionFreq['A']+=0.25;
-                    firstPositionFreq['G']+=0.25;
-                    firstPositionFreq['C']+=0.25;
-                    firstPositionFreq['T']+=0.25;
+                    // firstPositionFreq['A']+=0.25;
+                    // firstPositionFreq['G']+=0.25;
+                    // firstPositionFreq['C']+=0.25;
+                    // firstPositionFreq['T']+=0.25;
                 }
                 else if(i%3==1){
                     secondPositionLen += 1; 
-                    secondPositionFreq['A']+=0.25;
-                    secondPositionFreq['G']+=0.25;
-                    secondPositionFreq['C']+=0.25;
-                    secondPositionFreq['T']+=0.25;
+                    // secondPositionFreq['A']+=0.25;
+                    // secondPositionFreq['G']+=0.25;
+                    // secondPositionFreq['C']+=0.25;
+                    // secondPositionFreq['T']+=0.25;
                 }
                 else if(i%3==2){
                     thirdPositionLen += 1; 
-                    thirdPositionFreq['A']+=0.25;
-                    thirdPositionFreq['G']+=0.25;
-                    thirdPositionFreq['C']+=0.25;
-                    thirdPositionFreq['T']+=0.25;               
+                    // thirdPositionFreq['A']+=0.25;
+                    // thirdPositionFreq['G']+=0.25;
+                    // thirdPositionFreq['C']+=0.25;
+                    // thirdPositionFreq['T']+=0.25;               
                 }
 
              }
@@ -247,7 +247,6 @@ FileLoader.prototype = {
         allPositionFreq['C'] /= allPositionLengh;
         allPositionFreq['G'] /= allPositionLengh;
         allPositionFreq['T'] /= allPositionLengh;
-
 
         firstPositionFreq['A'] /= firstPositionLen;
         firstPositionFreq['C'] /= firstPositionLen;
