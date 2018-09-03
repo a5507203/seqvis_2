@@ -4,15 +4,18 @@ var ROOTTHREE = 1.7321;
 var ROOTSIX = 2.4495;
 
 // group ('A,C,G,T'  'AC,GT')
-function getCoordinates(  seqInfo, position, groups, axesName ) {
+function getCoordinates(  seqInfo, position, dim ) {
+
+    var axesNames = Config.graphTypes[dim].axesNames;
+    groups = dim.split(',');	
           
     if (groups.length == 2) {
           console.log(1);
-        return oneDimCoordinates(seqInfo, position, groups, axesName);
+        return oneDimCoordinates(seqInfo, position, groups, axesNames);
     }
     else if (groups.length == 3) {
                 console.log(3);
-        return twoDimCoordinates(seqInfo, position, groups, axesName);
+        return twoDimCoordinates(seqInfo, position, groups, axesNames);
     }
     else if (groups.length == 4) {
         console.log(4);
@@ -23,14 +26,14 @@ function getCoordinates(  seqInfo, position, groups, axesName ) {
 
 }
 
-function oneDimCoordinates(seqInfo, position, groups, axesName)  {
+function oneDimCoordinates(seqInfo, position, groups, axesNames)  {
     
     var data = {};
     
     var firstVertex = groups[0].split('');
 
-    var firstAxes = axesName[0];
-    var secondAxes = axesName[1];
+    var firstAxes = axesNames[0];
+    var secondAxes = axesNames[1];
         
     for( let [name,seq] of Object.entries(seqInfo) )  {
         
@@ -56,7 +59,7 @@ function oneDimCoordinates(seqInfo, position, groups, axesName)  {
     
 }
 // t l r
-function twoDimCoordinates(seqInfo, position, groups, axesName)  {
+function twoDimCoordinates(seqInfo, position, groups, axesNames)  {
     
     var data = {};
 
@@ -65,9 +68,9 @@ function twoDimCoordinates(seqInfo, position, groups, axesName)  {
     var secondVertex = groups[1].split('');
     var thirdVertex = groups[2].split('');
 
-    var firstAxes = axesName[0];
-    var secondAxes = axesName[1];
-    var thirdAxes = axesName[2];
+    var firstAxes = axesNames[0];
+    var secondAxes = axesNames[1];
+    var thirdAxes = axesNames[2];
 
     for( let [name,seq] of Object.entries(seqInfo) ) {
         

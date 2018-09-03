@@ -23,8 +23,8 @@ var Viewport = function ( editor ) {
 	var sceneHelpers = editor.sceneHelpers;
 
 	//SIGNALS
-	signals.addScene.add(function (sceneName, data,dim, axesName) {
-		editor.addScene(sceneName, data,dim, axesName);
+	signals.addScene.add(function (sceneName, data,dim, axesNames) {
+		editor.addScene(sceneName, data,dim, axesNames);
 	});
 	
 	signals.pointSizeChanged.add(function(size){
@@ -137,9 +137,8 @@ var Viewport = function ( editor ) {
 		var svgScene = new THREE.Scene();
 		svgScene.background = Config.colors.SCENELIGHT;
 		svgScene.add( new THREE.AmbientLight( 0x404040 ) );
-		svgScene.add(editor.drawGraph(scene, 'svg', scene.userData.dimNo, scene.userData.axesNames));
+		svgScene.add(editor.drawGraph(scene, 'svg', scene.userData.graphType.axesNames));
 	
-
 		var XMLS = new XMLSerializer();
 		svgRenderer.setSize( scene.userData.element.clientWidth*5, scene.userData.element.clientHeight*5 );
 		// svgRenderer.setSize( canvas.width, canvas.height, false );

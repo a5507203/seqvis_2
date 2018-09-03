@@ -114,7 +114,7 @@ Sidebar.View = function ( editor ) {
 			parameters.add(freqHeaderRow);
 			//1st position freq
 			parameters.add( addFrequenceRow(editor.inputData[objectName].firstPositionFreq, '1st pos') );
-
+			console.log(editor.inputData);
 			//2nd position freq
 			parameters.add( addFrequenceRow(editor.inputData[objectName].secondPositionFreq, '2nd pos') );
 

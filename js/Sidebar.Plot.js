@@ -38,25 +38,23 @@ Sidebar.Plot = function ( editor ) {
 		'ACT,G':'HG (ACT vs G)',
 		'GCT,A':'BA (GCT vs A)'
 	};
+		// if(codingType == 0) fprintf(outFile,"ACGT (A|C|G|T)\n");
+		// if(codingType == 1) fprintf(outFile,"CTR (C|T|AG)\n");
+		// if(codingType == 2) fprintf(outFile,"AGY (A|G|CT)\n");
+		// if(codingType == 3) fprintf(outFile,"ATS (A|T|CG)\n");
+		// if(codingType == 4) fprintf(outFile,"CGW (C|G|AT)\n");
+		// if(codingType == 5) fprintf(outFile,"ACK (A|C|GT)\n");
+		// if(codingType == 6) fprintf(outFile,"GTM (G|T|AC)\n");
+		// if(codingType == 7) fprintf(outFile,"KM (GT|AC)\n");
+		// if(codingType == 8) fprintf(outFile,"SW (GC|AT)\n");
+		// if(codingType == 9) fprintf(outFile,"RY (AG|CT)\n");
+		// if(codingType == 10) fprintf(outFile,"AB (A|CGT)\n");
+		// if(codingType == 11) fprintf(outFile,"CD (C|AGT)\n");
+		// if(codingType == 12) fprintf(outFile,"GH (G|ACT)\n");
+		// if(codingType == 13) fprintf(outFile,"TV (T|ACG)\n");
 
-	var axesNames = {
+		
 
-		'A,C,G,T':['A','C','G','T'],
-		'AT,G,C':['W','G','C'],
-		'AG,C,T':['R','T','C'],
-		'AC,G,T':['K','T','G'],
-		'A,TG,C':['A','M','C'],
-		'A,CT,G':['A','Y','G'],
-		'A,T,CG':['A','T','S'],
-		'AT,GC':['W','S'],
-		'AG,CT':['R','Y'],
-		'AC,GT':['K','M'],
-		'ATG,C':['D','C'],
-		'AGC,T':['V','T'],
-		'ACT,G':['H','G'],
-		'GCT,A':['B','A']
-
-	};
 
 	var plotOptionsRow = new UI.Row();
 	var plotOptions = new UI.Select().setOptions( plotTypes ).setWidth( '120px' ).setValue('A,C,G,T').setFontSize( '12px' );
@@ -69,13 +67,13 @@ Sidebar.Plot = function ( editor ) {
 	var addPlotButton = new UI.Button( 'Add plot' );
 	addPlotButton.onClick( function () {
 		if (editor.inputData == null) return; 
-		var dim = plotOptions.getValue();
-		var axesName = axesNames[dim];
-		dim = dim.split(',');	
-		var graphType = viewOptions.getValue();
-		console.log(axesName);
-		var newCoordinates = getCoordinates(editor.inputData,graphType, dim, axesName);
-		signals.addScene.dispatch(viewType[graphType],newCoordinates,dim,axesName);
+		var graphTypeIndex = plotOptions.getValue();
+		// var axesName = Config.axesNames[dim].axesName;
+	
+		var positionInfo = viewOptions.getValue();
+		
+		var newCoordinates = getCoordinates(editor.inputData, positionInfo, graphTypeIndex);
+		signals.addScene.dispatch(viewType[positionInfo],newCoordinates,graphTypeIndex);
 
 	} );
 	container.add(addPlotButton);
@@ -86,18 +84,18 @@ Sidebar.Plot = function ( editor ) {
 
 	signals.dataPrepared.add(function( ){
 		console.log('dataPrepared');
-		var singleCoordinates = getCoordinates(editor.inputData,'allPositionFreq' ,['A','C','G','T']);
+		var singleCoordinates = getCoordinates(editor.inputData,'allPositionFreq' ,'A,C,G,T');
 
-		signals.addScene.dispatch(viewType.allPositionFreq, singleCoordinates,['A','C','G','T'],['A','C','G','T']);
+		signals.addScene.dispatch(viewType.allPositionFreq, singleCoordinates,'A,C,G,T');
 
-		var firstPosCoordinates = getCoordinates(editor.inputData,'firstPositionFreq', ['A','C','G','T']);
-		signals.addScene.dispatch(viewType.firstPositionFreq,firstPosCoordinates,['A','C','G','T'],['A','C','G','T']);
+		var firstPosCoordinates = getCoordinates(editor.inputData,'firstPositionFreq', 'A,C,G,T');
+		signals.addScene.dispatch(viewType.firstPositionFreq,firstPosCoordinates,'A,C,G,T');
 
-		var secondPosCoordinates = getCoordinates(editor.inputData,'secondPositionFreq', ['A','C','G','T']);
-		signals.addScene.dispatch(viewType.secondPositionFreq,secondPosCoordinates,['A','C','G','T'],['A','C','G','T']);
+		var secondPosCoordinates = getCoordinates(editor.inputData,'secondPositionFreq', 'A,C,G,T');
+		signals.addScene.dispatch(viewType.secondPositionFreq,secondPosCoordinates,'A,C,G,T');
 
-		var thirdPosCoordinates = getCoordinates(editor.inputData,'thirdPositionFreq', ['A','C','G','T']);
-		signals.addScene.dispatch(viewType.thirdPositionFreq,thirdPosCoordinates,['A','C','G','T'],['A','C','G','T']);
+		var thirdPosCoordinates = getCoordinates(editor.inputData,'thirdPositionFreq', 'A,C,G,T');
+		signals.addScene.dispatch(viewType.thirdPositionFreq,thirdPosCoordinates,'A,C,G,T');
 		
 		
 	});

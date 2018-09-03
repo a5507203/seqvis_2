@@ -16,7 +16,25 @@ var Config = {
         
     },
     scalar:300,
-    lineWidth: 0.007
+    lineWidth: 0.007,
+    graphTypes : {
+
+		'A,C,G,T':{ codingType: 0, axesNames:['A','C','G','T']},
+		'AT,G,C':{ codingType: 4, axesNames:['W','G','C']},
+		'AG,C,T':{ codingType: 1, axesNames:['R','T','C']},
+		'AC,G,T':{ codingType: 6, axesNames:['K','T','G']},
+		'A,TG,C':{ codingType: 5, axesNames:['A','M','C']},
+		'A,CT,G':{ codingType: 2, axesNames:['A','Y','G']},
+		'A,T,CG':{ codingType: 3, axesNames:['A','T','S']},
+		'AT,GC':{ codingType: 8, axesNames:['W','S']},
+		'AG,CT':{ codingType: 9, axesNames:['R','Y']},
+		'AC,GT':{ codingType: 7, axesNames:['K','M']},
+		'ATG,C':{ codingType: 11, axesNames:['D','C']},
+		'AGC,T':{ codingType: 13, axesNames:['V','T']},
+		'ACT,G':{ codingType: 12, axesNames:['H','G']},
+		'GCT,A':{ codingType: 10, axesNames:['B','A']}
+
+	}
     
 
     // colorScheme:{

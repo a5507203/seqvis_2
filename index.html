@@ -52,6 +52,8 @@
 		<script src="js/Sidebar.Plot.js"></script>
 		<script src="js/Sidebar.Settings.js"></script>
 
+		<script src="js/MatchedPairsTest.js"></script>
+
 
 		<div class="landingPageContainer">
  
@@ -145,6 +147,8 @@
 			
 						var toolbar = new Toolbar(editor);
 						document.body.appendChild(toolbar.dom);
+
+						var matchedPairsTest = new MatchedPairsTest(editor);
 			
 						function onWindowResize( event ) {
 			

@@ -272,7 +272,8 @@ FileLoader.prototype = {
                 unknownSeqNum:unknownSeqNum,
                 gapNum:gapNum,
                 otherSeqNum:otherSeqNum,
-                totalLen:data.length
+                totalLen:data.length,
+                sequence:data
                 };
     },
     

@@ -50,7 +50,7 @@ var Editor = function (  ) {
 		objectChanged: new Signal(),
 		pointSizeChanged: new Signal(),
 		refreshSidebarObjectProperties: new Signal(),
-
+		matchedPairsTest: new Signal(),
 		addScene: new Signal(),
 		setSceneSize: new Signal(),
 		deleteScene: new Signal(),	
@@ -246,7 +246,8 @@ Editor.prototype = {
 		toggleWireframeButton.style['background-image'] = 'url(./image/triangle.png)';
 		footRow.appendChild(toggleWireframeButton);
 		toggleWireframeButton.onclick = function() {
-			scope.signals.hideChild.dispatch(scene, 'wireframe');
+			// scope.signals.hideChild.dispatch(scene, 'wireframe');
+			scope.signals.matchedPairsTest.dispatch(scene.userData.graphType.codingType);
 		};
 
 
@@ -284,8 +285,9 @@ Editor.prototype = {
 
 	},
 
-	drawGraph : function( scene, renderType, dimNo, axesNames, data  ) {
+	drawGraph : function( scene, renderType, axesNames, data  ) {
 		
+		var dimNo = axesNames.length-1;
 		var graphContainer = new THREE.Group();
 		var graphGroup = new THREE.Group();
 		graphContainer.add(graphGroup);
@@ -300,16 +302,14 @@ Editor.prototype = {
 			graphGroup.add(this.drawWireframe( dimNo, renderType,true ));
 			graphGroup.add(this.drawAxes( dimNo, axesNames, renderType, true, true ));
 			points = this.drawData( data );
-
 			scene.userData.objects = points;
-			scene.userData.dimNo = dimNo;
-			scene.userData.axesNames = axesNames;
 		}else{
 			graphGroup.add(this.drawWireframe( dimNo, renderType,scene.children[1].children[0].children[0].visible ));
-		
 			graphGroup.add(this.drawAxes( dimNo, axesNames, renderType, scene.children[1].children[0].children[1].children[0].visible, scene.children[1].children[0].children[1].children[1].visible,  scene.userData.camera.quaternion ));
 			
-			points = scene.children[1].children[0].children[2].clone();
+			material = scene.children[1].children[0].children[2].material.clone();
+			geometry = scene.children[1].children[0].children[2].geometry.clone();
+			points = new THREE.Points( geometry, material );
 			points.material.color = Config.colors.BLACK;
 			points.material.needsUpdate = true;
 		}
@@ -322,26 +322,6 @@ Editor.prototype = {
 		
 	}, 
 
-	// drawSVGScene: function( scene ){
-		
-	// 	var dim  = scene.userData.dim;
-	// 	var svgScene = new THREE.Scene();
-	// 	svgScene.background = Config.colors.SCENELIGHT;
-	// 	svgScene.add( new THREE.AmbientLight( 0x404040 ) );
-	// 	var graphContainer = new THREE.Group();
-	// 	var graphGroup = new THREE.Group();
-	// 	graphContainer.add(graphGroup);
-	// 	svgScene.add(graphContainer);
-			
-	// 	if(dim == 1) graphGroup.position.set(-0.5*Config.scalar, 0, 0);
-	// 	if(dim == 2) graphGroup.position.set(-0.5*Config.scalar, -ROOTTHREE/6*Config.scalar, 0);
-	// 	if(dim == 3) graphGroup.position.set(-0.5*Config.scalar, -ROOTTHREE/9*Config.scalar, -ROOTTHREE/6*Config.scalar);
-
-	// 	graphGroup.add(this.drawWireframe( scene.userData.dim, 'svg' ));
-		
-	// 	return svgScene;
-
-	// },
 
 	drawLineSegments2 : function (geoBColor,geoCColor, linewidth, vertices){
 
@@ -917,10 +897,13 @@ Editor.prototype = {
 	},
 
 
-	addScene: function(sceneName, data, dim, axesNames ){
+	addScene: function(sceneName, data, dim ){
+
+		var graphType = Config.graphTypes[dim];
+		
 		var scope = this;
 		var scene = new THREE.Scene();
-
+		scene.userData.graphType = graphType;
 		// CREATE ELEMENT IN HTML
 		var element = this.createSceneContainer(sceneName,scene);
 		scene.userData.element = element.querySelector( ".scene" );
@@ -966,13 +949,12 @@ Editor.prototype = {
 				});
 
 			}
-
 			scope.signals.renderRequired.dispatch();
 		});
 		scene.userData.orbitControls = orbitControls;
-
+		scene.userData.graphType = graphType;
 		//ADD AXIS AND DATA
-		var container = scope.drawGraph(scene,'render', dim.length-1, axesNames,data );
+		var container = scope.drawGraph(scene,'render', graphType.axesNames, data );
 		scene.add( container );
 
 		//ADD OBJECT SELECTION CONTROLS
