@@ -454,7 +454,7 @@ function Sum_Over_Odd_Terms(x,dof){
    var sqrtx;
    var twooverpi;
 	
-   twooverpi = 0.63661977;
+   twooverpi = 0.6366197723675813430755350534900574;
 	
    if (dof == 1) return 2.0 * xGaussian_Distribution_Tail( Math.sqrt(x) );
    n = (dof - 1) / 2;
@@ -488,13 +488,13 @@ function Sum_Poisson_Terms(x, n) {
 
 function xGaussian_Distribution_Tail( x ){
     // console.log('xga')
-   var sqrt2 = 0.70710678;
+   var sqrt2 = 0.7071067811865475244008443621048490;
    return  0.5 * erfc(sqrt2 * x );
 }
 
 
 function erfc(x){
-
+    
 	z = Math.abs(x);
 	t = 1.0 / (0.5 * z + 1.0);
 	a1 = t * 0.17087277 + -0.82215223;
@@ -518,28 +518,28 @@ function erfc(x){
 
 }
 
-function erf(x) {
-    // constants
-    var a1 =  0.254829592;
-    var a2 = -0.284496736;
-    var a3 =  1.421413741;
-    var a4 = -1.453152027;
-    var a5 =  1.061405429;
-    var p  =  0.3275911;
+// function erf(x) {
+//     // constants
+//     var a1 =  0.254829592;
+//     var a2 = -0.284496736;
+//     var a3 =  1.421413741;
+//     var a4 = -1.453152027;
+//     var a5 =  1.061405429;
+//     var p  =  0.3275911;
 
-    // Save the sign of x
-    var sign = 1;
-    if (x < 0) {
-        sign = -1;
-    }
-    x = Math.abs(x);
+//     // Save the sign of x
+//     var sign = 1;
+//     if (x < 0) {
+//         sign = -1;
+//     }
+//     x = Math.abs(x);
 
-    // A&S formula 7.1.26
-    var t = 1.0/(1.0 + p*x);
-    var y = 1.0 - (((((a5*t + a4)*t) + a3)*t + a2)*t + a1)*t*Math.exp(-x*x);
+//     // A&S formula 7.1.26
+//     var t = 1.0/(1.0 + p*x);
+//     var y = 1.0 - (((((a5*t + a4)*t) + a3)*t + a2)*t + a1)*t*Math.exp(-x*x);
 
-    return sign*y;
-}
+//     return sign*y;
+// }
 
 
 // var newArray = array[0].map(function(col, i){
