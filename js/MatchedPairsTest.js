@@ -27,6 +27,7 @@ MatchedPairsTest.prototype = {
 
         var sizeUV,sizeYZ;
         var testResult = {};
+    
 
         if (codingType == 0) { sizeYZ = 6; sizeUV = 4;}
         if (codingType == 1) { sizeYZ = 3; sizeUV = 3;}
@@ -44,8 +45,10 @@ MatchedPairsTest.prototype = {
         if (codingType == 13) { sizeYZ = 1; sizeUV = 2;}
 
 
-        var seqNames = Object.keys(data);
+        var seqNames = Object.keys(data).sort();
         var seqNums = seqNames.length;
+
+        var p_result = 'seq1,seq2,p-value\n';
 
         if (Object.keys(this.pairsMatrix).length!=0) needToGetAllPosition = 0;
         else needToGetAllPosition = 1;
@@ -59,7 +62,7 @@ MatchedPairsTest.prototype = {
 
             var seq1 = data[seq1Name].sequence;
 
-            for (var j = 0; j < seqNums; j+=1 ){
+            for (var j = i+1; j < seqNums; j+=1 ){
 
                 var seq2Name = seqNames[j];
                 var seq2 = data[seq2Name].sequence;
@@ -75,19 +78,23 @@ MatchedPairsTest.prototype = {
                 dm = this.getSiteDivergenceMatrix(dm, codingType);
                 
                 [vectorY,vectorZ,vectorU,vectorV] = this.getVectorYZUV(sizeYZ, sizeUV, dm);
-                if(i<j){
+
+                //if(i<j){
                     // console.log(dm);
                     // console.log('vectorY',vectorY);
                     // console.log('vectorZ',vectorZ);
                     // console.log('vectorU',vectorU);
                     // console.log('vectorV',vectorV);
-                }
-                testResult[seq1Name][seq2Name] = this.pairTest(seq1Name,seq2Name,sizeYZ,sizeUV,vectorY,vectorZ,vectorU,vectorV);
-                
+               // }
+                //testResult[seq1Name][seq2Name] = this.pairTest(seq1Name,seq2Name,sizeYZ,sizeUV,vectorY,vectorZ,vectorU,vectorV);
+
+                var p = this.pairTest(seq1Name,seq2Name,sizeYZ,sizeUV,vectorY,vectorZ,vectorU,vectorV);
+                p_result += seq1Name +','+seq2Name+','+ p +'\n';
             }
 
         }
-        // console.log(testResult);
+        saveString(p_result,'matched_pair_test.csv');
+        console.log(p_result);
         return testResult;
 
     },
@@ -532,4 +539,27 @@ function erf(x) {
     var y = 1.0 - (((((a5*t + a4)*t) + a3)*t + a2)*t + a1)*t*Math.exp(-x*x);
 
     return sign*y;
+}
+
+
+// var newArray = array[0].map(function(col, i){
+//     return array.map(function(row){
+//         return row[i];
+//     });
+// });
+
+function save( blob, filename ) {
+
+    link.href = URL.createObjectURL( blob );
+    link.download = filename || 'data.json';
+    link.click();
+
+    // URL.revokeObjectURL( url ); breaks Firefox...
+
+}
+
+function saveString( text, filename ) {
+
+    save( new Blob( [ text ], { type: 'text/plain' } ), filename );
+
 }

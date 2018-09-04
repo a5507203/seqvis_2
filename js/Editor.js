@@ -246,8 +246,7 @@ Editor.prototype = {
 		toggleWireframeButton.style['background-image'] = 'url(./image/triangle.png)';
 		footRow.appendChild(toggleWireframeButton);
 		toggleWireframeButton.onclick = function() {
-			// scope.signals.hideChild.dispatch(scene, 'wireframe');
-			scope.signals.matchedPairsTest.dispatch(scene.userData.graphType.codingType);
+			scope.signals.hideChild.dispatch(scene, 'wireframe');
 		};
 
 
@@ -267,6 +266,15 @@ Editor.prototype = {
 			scope.signals.takeSvgImage.dispatch(scene);
 		};
 		footRow.appendChild(svgButton);
+
+		var mptButton = document.createElement('button');
+		mptButton.setAttribute('class','optionButton');
+		mptButton.style['background-image'] = 'url(./image/mpt.png)';
+		
+		mptButton.onclick = function(){
+			scope.signals.matchedPairsTest.dispatch(scene.userData.graphType.codingType);
+		};
+		footRow.appendChild(mptButton);
 
 		var closeButton = document.createElement('button');
 		closeButton.setAttribute('class','optionButton');
