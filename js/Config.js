@@ -34,6 +34,12 @@ var Config = {
 		'ACT,G':{ codingType: 12, axesNames:['H','G']},
 		'GCT,A':{ codingType: 10, axesNames:['B','A']}
 
+	},
+    positions : {
+		'All position':0,
+		'1st codon position':1,
+		'2nd codon position':2,
+		'3rd codon position':3
 	}
     
 

@@ -148,7 +148,7 @@ var Viewport = function ( editor ) {
 
 		svgRenderer.render( svgScene, scene.userData.camera );
 		var svgData = XMLS.serializeToString(svgRenderer.domElement);
-		save(new Blob([svgData], {type:"image/svg+xml;charset=utf-8"}));
+		save(new Blob([svgData], {type:"image/svg+xml;charset=utf-8"}),scene.userData.sceneName+'.svg');
 	} );
 
 

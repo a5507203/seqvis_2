@@ -6,9 +6,9 @@ MatchedPairsTest = function (editor) {
     var signals = this.signals = editor.signals;
     var scope = this;
     
-    signals.matchedPairsTest.add(function(codingType){
+    signals.matchedPairsTest.add(function(codingType, position){
 
-        scope.matchedPairsTest(codingType);
+        scope.matchedPairsTest(codingType,position);
 
     });
 
@@ -21,13 +21,13 @@ MatchedPairsTest.prototype = {
 
 
 
-    matchedPairsTest: function(codingType){
+    matchedPairsTest: function(codingType,position){
 
         var data = this.editor.inputData;
 
         var sizeUV,sizeYZ;
-        var testResult = {};
-    
+        // var testResult = {};
+        var positionIndex = Config.positions[position];
 
         if (codingType == 0) { sizeYZ = 6; sizeUV = 4;}
         if (codingType == 1) { sizeYZ = 3; sizeUV = 3;}
@@ -49,27 +49,43 @@ MatchedPairsTest.prototype = {
         var seqNums = seqNames.length;
 
         var p_result = 'seq1,seq2,p-value\n';
+        var test_result = ','+seqNames.join()+'\n';
 
-        if (Object.keys(this.pairsMatrix).length!=0) needToGetAllPosition = 0;
-        else needToGetAllPosition = 1;
+        var p_values_summary = {};
+        p_values_summary['0.01'] = 0;
+        p_values_summary['0.05'] = 0;
+        p_values_summary['0.001'] = 0;
+        p_values_summary['0.005'] = 0;
+        p_values_summary['0.0001'] = 0;
+        p_values_summary['0.0005'] = 0;
+        p_values_summary['0.00001'] = 0;
+        p_values_summary['0.00005'] = 0;
+        // if (Object.keys(this.pairsMatrix).length!=0) needToGetAllPosition = 0;
+        // else needToGetAllPosition = 1;
+        needToGetAllPosition = 1;
 
+        var nt= 0;
         for (var i = 0; i < seqNums; i+=1 ){
 
             var seq1Name = seqNames[i];
+            test_result += seq1Name+','.repeat(i)+',1';
 
             if(needToGetAllPosition) this.pairsMatrix[seq1Name] = {};
-            testResult[seq1Name] = {};
+            //testResult[seq1Name] = {};
 
             var seq1 = data[seq1Name].sequence;
-
+            
+            nt ++;
             for (var j = i+1; j < seqNums; j+=1 ){
+
+                
 
                 var seq2Name = seqNames[j];
                 var seq2 = data[seq2Name].sequence;
                 var dm;
 
                 if(needToGetAllPosition) {
-                    dm = this.pairsMatrix[seq1Name][seq2Name] = this.getAllPositionDivergenceMatrix(seq1,seq2);
+                    dm = this.pairsMatrix[seq1Name][seq2Name] = this.getAllPositionDivergenceMatrix(seq1,seq2,positionIndex);
                 }
                 else{
                     dm = this.pairsMatrix[seq1Name][seq2Name];
@@ -89,13 +105,50 @@ MatchedPairsTest.prototype = {
                 //testResult[seq1Name][seq2Name] = this.pairTest(seq1Name,seq2Name,sizeYZ,sizeUV,vectorY,vectorZ,vectorU,vectorV);
 
                 var p = this.pairTest(seq1Name,seq2Name,sizeYZ,sizeUV,vectorY,vectorZ,vectorU,vectorV);
-                p_result += seq1Name +','+seq2Name+','+ p +'\n';
-            }
+          
 
+                if (p < 0.00001) {p_values_summary['0.00001']+=1;p+='**';}
+                else if (p < 0.00005) {p_values_summary['0.00005']+=1;p+='**';}
+                else if (p < 0.0001) {p_values_summary['0.0001']+=1;p+='**';}
+                else if (p < 0.0005) {p_values_summary['0.0005']+=1;p+='**';}
+                else if (p < 0.001) {p_values_summary['0.001']+=1;p+='**';}
+                else if (p < 0.005) {p_values_summary['0.005']+=1;p+='*';}
+                else if (p < 0.01) {p_values_summary['0.01']+=1;p+='*';}
+                else if (p < 0.05) {p_values_summary['0.05']+=1;}
+
+                // if (p < 0.001) {p+='**';}
+                // else if (p < 0.01) {p+='*';}
+
+                p_result += seq1Name +','+seq2Name+','+ p +'\n';
+                test_result += ','+p;
+                
+            }
+        
+            test_result += '\n';
         }
-        saveString(p_result,'matched_pair_test.csv');
-        console.log(p_result);
-        return testResult;
+        
+        var numberOfTest = seqNums*(1+seqNums)/2;
+
+        var header = 'number of test,' + numberOfTest + '\n';
+        header += 'p values interval, number, proportion\n';
+        
+        var summaryKeys = Object.keys(p_values_summary).sort();
+
+        // console.log(p_values_summary);
+     
+        for( i = 0 ; i < summaryKeys.length ; i+=1 ){
+            
+           
+            if( i != 0 ) { p_values_summary[summaryKeys[i]] += p_values_summary[summaryKeys[i-1]]; }
+            var currentNum = p_values_summary[summaryKeys[i]];
+            header += summaryKeys[i] + ',' + currentNum + ',' + Math.round10(currentNum/numberOfTest,-5) + '\n';
+        }
+
+        test_result = header +'\n'+ test_result;
+        console.log(test_result);
+        saveString(test_result,'matched_pair_test'+position+'.csv');
+    
+        return test_result;
 
     },
 
@@ -187,11 +240,31 @@ MatchedPairsTest.prototype = {
         return [vectorY,vectorZ,vectorU,vectorV];
     },
 
-    getAllPositionDivergenceMatrix: function (seq1, seq2){
+    getAllPositionDivergenceMatrix: function (seq1, seq2, position){
+        var increamental;
+        var startIndex;
+        if ( position == 0 ){
+            startIndex = 0;
+            increamental = 1;
+
+        }else if( position == 1 ){
+            startIndex = 0;
+            increamental = 3;
+        }
+
+        else if( position == 2 ){
+            startIndex = 1;
+            increamental = 3;
+        }
+
+        else if( position == 3 ){
+            startIndex = 2;
+            increamental = 3;
+        }
 
         var dm = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
         var length_1 = seq1.length;
-        for(var h = 0; h < length_1; h++) {       /*requires that length_1 = length_2*/
+        for(var h = startIndex; h < length_1; h += increamental) {       /*requires that length_1 = length_2*/
 
             var a = seq1[h];
             var b = seq2[h];

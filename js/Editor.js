@@ -272,7 +272,8 @@ Editor.prototype = {
 		mptButton.style['background-image'] = 'url(./image/mpt.png)';
 		
 		mptButton.onclick = function(){
-			scope.signals.matchedPairsTest.dispatch(scene.userData.graphType.codingType);
+			console.log(Config.positions[sceneName]);
+			scope.signals.matchedPairsTest.dispatch(scene.userData.graphType.codingType,scene.userData.sceneName);
 		};
 		footRow.appendChild(mptButton);
 
@@ -908,11 +909,17 @@ Editor.prototype = {
 	addScene: function(sceneName, data, dim ){
 
 		var graphType = Config.graphTypes[dim];
-		
+
+		// var increamental;
+		// if(sceneName == 'All position') increamental = 1;
+		// else if(sceneName == '1st codon position')
+		// else if(sceneName == '2nd codon position')
+		// else 
 		var scope = this;
 		var scene = new THREE.Scene();
 		scene.userData.graphType = graphType;
 		// CREATE ELEMENT IN HTML
+		scene.userData.sceneName = sceneName;
 		var element = this.createSceneContainer(sceneName,scene);
 		scene.userData.element = element.querySelector( ".scene" );
 		scope.viewport.appendChild( element );
