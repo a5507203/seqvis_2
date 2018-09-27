@@ -15,6 +15,7 @@ var Config = {
         SELECTED: new THREE.Color(0x00ff00),
         
     },
+    initPointSize: 8,
     scalar:300,
     lineWidth: 0.007,
     graphTypes : {

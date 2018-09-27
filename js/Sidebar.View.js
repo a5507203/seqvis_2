@@ -28,7 +28,7 @@ Sidebar.View = function ( editor ) {
 	
 	
 	var pointSizeRow = new UI.Row();
-	var pointSizeSlider = new UI.Slider(2,20,6);
+	var pointSizeSlider = new UI.Slider(2,20,Config.initPointSize*2);
 
 	pointSizeRow.add(new UI.Text( 'Set point size' ).setWidth( '100px' ) );
 	pointSizeRow.add( pointSizeSlider );
@@ -38,7 +38,7 @@ Sidebar.View = function ( editor ) {
 	signals.editorCleared.add(function(){
 		theme.setValue('0');
 		editor.colorScheme = 0;
-		pointSizeSlider.setValue(6);
+		pointSizeSlider.setValue(Config.initPointSize*2);
 	});
 	
 	pointSizeSlider.dom.oninput = function() {

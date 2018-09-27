@@ -886,7 +886,7 @@ Editor.prototype = {
 		}
 		geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ));
 		geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
-		var material = new THREE.PointsMaterial( { size: 3, vertexColors: THREE.VertexColors, alphaTest: 0.5, depthTest: true,map:Config.dataTexture } );
+		var material = new THREE.PointsMaterial( { size: Config.initPointSize, vertexColors: THREE.VertexColors, alphaTest: 0.5, depthTest: true,map:Config.dataTexture } );
 		var points = new THREE.Points( geometry, material );
 		points.name = 'data';
 		// group.add( points );

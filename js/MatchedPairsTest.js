@@ -20,7 +20,6 @@ MatchedPairsTest.prototype = {
 
 
 
-
     matchedPairsTest: function(codingType,position){
 
         var data = this.editor.inputData;
