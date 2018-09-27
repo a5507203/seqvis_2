@@ -127,8 +127,8 @@
 				var fontLader = new THREE.FontLoader();
 				textureloader.load( './image/disc.png', function( texture ) {
 					Config.dataTexture = texture;
-					fontLader.load( './fonts/helvetiker_regular.typeface.json', function ( font ) {
-						Config.font = font;
+					// fontLader.load( './fonts/helvetiker_regular.typeface.json', function ( font ) {
+					// 	Config.font = font;
 						Config.dataTexture = texture;
 						console.log('loaded');
 						var editor = new Editor();
@@ -157,7 +157,7 @@
 						window.addEventListener( 'resize', onWindowResize, false );
 			
 						onWindowResize();
-					});
+					// });
 				}, false );
 
 			}
