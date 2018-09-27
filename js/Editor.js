@@ -314,6 +314,7 @@ Editor.prototype = {
 			scene.userData.objects = points;
 		}else{
 			graphGroup.add(this.drawWireframe( dimNo, renderType,scene.children[1].children[0].children[0].visible ));
+			console.log(scene.children[1].children[0].children[1].children[0]);
 			graphGroup.add(this.drawAxes( dimNo, axesNames, renderType, scene.children[1].children[0].children[1].children[0].visible, scene.children[1].children[0].children[1].children[1].visible,  scene.userData.camera.quaternion ));
 			
 			material = scene.children[1].children[0].children[2].material.clone();
@@ -345,7 +346,6 @@ Editor.prototype = {
 			color: 0xffffff,
 			linewidth: linewidth, 
 			vertexColors: THREE.VertexColors,
-			//resolution:  // to be set by renderer, eventually
 			dashed: false
 		} );
 	
@@ -651,7 +651,7 @@ Editor.prototype = {
 		// this.calcuateLabel(new THREE.Vector3(0.5, 0, ROOTTHREE/2),new THREE.Vector3(0.5, ROOTSIX/9, ROOTTHREE/6));
 
 		if(renderType == 'render') axesGroup.add(this.drawLineSegments2(blackColors,coloredColors, Config.lineWidth, vertices));
-		else if(drawAxes) axesGroup.add(this.drawLineSegments(Config.lineWidth, vertices));
+		else if(drawAxes) {axesGroup.add(this.drawLineSegments(Config.lineWidth, vertices));axesGroup.visible = true;}
 
 		return group;
 

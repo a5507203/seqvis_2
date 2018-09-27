@@ -9,6 +9,8 @@ var Config = {
     host:'http://localhost:3000',
     colors:{
         SCENEDARK:new THREE.Color(0x030303),
+         //SCENEDARK:new THREE.Color(0x363636),
+     
         SCENELIGHT: new THREE.Color(0xffffff),
         DATARED: new THREE.Color(0xff3721),
         BLACK: new THREE.Color(0x000000),

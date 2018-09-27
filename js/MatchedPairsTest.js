@@ -23,7 +23,7 @@ MatchedPairsTest.prototype = {
     matchedPairsTest: function(codingType,position){
 
         var data = this.editor.inputData;
-
+        var f = 3;
         var sizeUV,sizeYZ;
         // var testResult = {};
         var positionIndex = Config.positions[position];
@@ -105,18 +105,18 @@ MatchedPairsTest.prototype = {
 
                 var p = this.pairTest(seq1Name,seq2Name,sizeYZ,sizeUV,vectorY,vectorZ,vectorU,vectorV);
           
-
-                if (p < 0.00001) {p_values_summary['0.00001']+=1;p+='**';}
-                else if (p < 0.00005) {p_values_summary['0.00005']+=1;p+='**';}
-                else if (p < 0.0001) {p_values_summary['0.0001']+=1;p+='**';}
-                else if (p < 0.0005) {p_values_summary['0.0005']+=1;p+='**';}
-                else if (p < 0.001) {p_values_summary['0.001']+=1;p+='**';}
-                else if (p < 0.005) {p_values_summary['0.005']+=1;p+='*';}
-                else if (p < 0.01) {p_values_summary['0.01']+=1;p+='*';}
-                else if (p < 0.05) {p_values_summary['0.05']+=1;}
-
-                // if (p < 0.001) {p+='**';}
-                // else if (p < 0.01) {p+='*';}
+                if ( p == 0){p += '**';}
+                else if (p < 0.00001) {p_values_summary['0.00001']+=1;p = p.toExponential(f) + '**';}
+                else if (p < 0.00005) {p_values_summary['0.00005']+=1;p = p.toExponential(f) + '**';}
+                else if (p < 0.0001) {p_values_summary['0.0001']+=1;p = p.toExponential(f) + '**';}
+                else if (p < 0.0005) {p_values_summary['0.0005']+=1;p = p.toExponential(f) + '**';}
+                else if (p < 0.001) {p_values_summary['0.001']+=1;p = p.toExponential(f) + '**';}
+                else if (p < 0.005) {p_values_summary['0.005']+=1;p = p.toExponential(f) + '*';}
+                else if (p < 0.01) {p_values_summary['0.01']+=1;p = p.toExponential(f) + '*';}
+                else if (p < 0.05) {p_values_summary['0.05']+=1;p = p.toExponential(f);}
+                else {p = Math.round10(p,f);}
+                // if (p < 0.001) {p = p.toExponential(f) + '**';}
+                // else if (p < 0.01) {p = p.toExponential(f) + '*';}
 
                 p_result += seq1Name +','+seq2Name+','+ p +'\n';
                 test_result += ','+p;
@@ -128,7 +128,7 @@ MatchedPairsTest.prototype = {
         
         var numberOfTest = seqNums*(1+seqNums)/2;
 
-        var header = 'number of test,' + numberOfTest + '\n';
+        var header = 'Number of tests,' + numberOfTest + '\n';
         header += 'p values interval, number, proportion\n';
         
         var summaryKeys = Object.keys(p_values_summary).sort();

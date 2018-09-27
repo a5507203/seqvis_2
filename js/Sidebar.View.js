@@ -64,7 +64,7 @@ Sidebar.View = function ( editor ) {
 	searchRow.add(searchButton);
 
 		
-	document.addEventListener( 'keydown', function ( event ) {
+	seqName.dom.addEventListener( 'keydown', function ( event ) {
 
 		switch ( event.keyCode ) {
 			case 13:
